@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const userRoutes = require('./routes/user');
 
 // Création de l'application Express
@@ -17,6 +18,10 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
+
+// Gestion de la ressource "images" de manière statique
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Enregistrements des routes
 

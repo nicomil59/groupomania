@@ -1,4 +1,4 @@
-// Import du plugin 'validator'
+// Import du package 'validator'
 
 const validator = require('validator');
 

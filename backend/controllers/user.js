@@ -2,32 +2,26 @@
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const CryptoJS = require("crypto-js");
+const fs = require('fs');
 const db = require('../models');
 const isEmailValid = require('../utils/emailValid');
-const {
-    isPasswordValid,
-    validationMessages
-} = require('../utils/passwordValid');
+const { isPasswordValid, validationMessages } = require('../utils/passwordValid');
 const isUsernameValid = require('../utils/usernameValid');
+const { encrypt, decrypt } = require('../utils/emailCrypto');
 
 require('dotenv').config();
 
-// const usertest = "8jane";
-// console.log("test username", isUsernameValid(usertest));
 
 // ********** Gestion de la création d'un nouvel utilisateur **********
 // ********************************************************************
 
 exports.signup = (req, res) => {
 
-    console.log("requete :", req.body.username);
-
     // Vérification de la validité du pseudo
 
     if (!isUsernameValid(req.body.username)) {
         return res.status(400).json({
-            message: "Pseudo non valide : doit commencer par une lettre et contenir entre 8 et 30 caractètres alphanumériques"
+            message: "Pseudo non valide : doit commencer par une lettre et contenir entre 3 et 30 caractères alphanumériques"
         });
     }
 
@@ -48,9 +42,9 @@ exports.signup = (req, res) => {
         });
     }
 
-    // Chiffrement de l'email
+    // Cryptage de l'email
 
-    const emailEncrypted = CryptoJS.HmacSHA256(req.body.email, process.env.CRYPTOJS_KEY).toString();
+    const emailEncrypted = encrypt(req.body.email);
 
     // Hachage du mot de passe avant enregistrement du nouvel utilisateur dans la BD
 
@@ -60,19 +54,26 @@ exports.signup = (req, res) => {
             db.User.create({
                     username: req.body.username,
                     email: emailEncrypted,
-                    password: hash
+                    password: hash,
+                    avatar: `${req.protocol}://${req.get('host')}/images/default-avatar.png`
                 })
                 .then(() => res.status(201).json({
                     message: 'Utilisateur créé !'
                 }))
-                .catch(error => res.status(400).json({
-                    message: error.message
-                }));
+                .catch(error => {
+                    
+                    const errorMessage = error.errors[0].message;
+
+                    res.status(400).json({
+                        message: errorMessage
+                }
+                )});
 
         })
-        .catch(error => res.status(500).json({
+        .catch(error => {
+            res.status(500).json({
             message: error.message
-        }));
+        })});
 
 };
 
@@ -81,16 +82,11 @@ exports.signup = (req, res) => {
 
 exports.signin = (req, res, next) => {
 
-    // Chiffrement de l'email
-
-    const emailEncrypted = CryptoJS.HmacSHA256(req.body.email, process.env.CRYPTOJS_KEY).toString();
-    console.log(emailEncrypted);
-
-    // Récupération de l'email chiffré dans la BD
+    // Récupération du pseudo dans la BD
 
     db.User.findOne({
             where: {
-                email: emailEncrypted
+                username: req.body.username
             }
         })
         .then(user => {
@@ -103,7 +99,7 @@ exports.signin = (req, res, next) => {
                 });
             }
 
-            // Comparaison du mot de passe entré par utilisateur avec mot de passe hashé dans la BD
+            // Comparaison du mot de passe entré par l'utilisateur avec mot de passe hashé dans la BD
 
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
@@ -114,12 +110,12 @@ exports.signin = (req, res, next) => {
                     }
                     // Renvoi du token encodé contenant le userId
                     res.status(200).json({
-                        user: user,
+                        userId: user.id,
                         token: jwt.sign({
                                 userId: user.id
                             },
-                            process.env.TOKEN_SECRET_KEY, {
-                                expiresIn: '24h'
+                                process.env.TOKEN_SECRET_KEY, {
+                                    expiresIn: '24h'
                             }
                         )
                     });
@@ -135,7 +131,7 @@ exports.signin = (req, res, next) => {
 };
 
 // ********** Visualition du profil d'un utilisateur **********
-// ********************************************************************
+// ************************************************************
 
 exports.getUser = (req, res, next) => {
 
@@ -159,15 +155,26 @@ exports.getUser = (req, res, next) => {
 
             // Vérification de l'autorisation de l'utilisateur
 
-            console.log("req.auth.userId", req.auth.userId);
-
             if (req.auth.userId !== user.id) {
                 return res.status(403).json({
                     message: 'Requête non autorisée !'
                 });
             }
 
-            res.status(200).json(user);
+            // Décryptage de l'email de la BD
+            const emailDecrypted = decrypt(user.email);
+
+            // Objet avec les données à renvoyer
+
+            const userData = {
+                userId: user.id,
+                username: user.username,
+                email: emailDecrypted,
+                bio: user.bio,
+                avatar: user.avatar
+            };
+
+            res.status(200).json(userData);
         })
         .catch(error => {
             res.status(404).json({
@@ -200,15 +207,11 @@ exports.updatePwdUser = (req, res, next) => {
 
             // Vérification de l'autorisation de l'utilisateur
 
-            console.log("req.auth.userId", req.auth.userId);
-
             if (req.auth.userId !== user.id) {
                 return res.status(403).json({
                     message: 'Requête non autorisée !'
                 });
             }
-
-            console.log("nouveau password", req.body.password);
 
             // Hachage du nouveau mot de passe avant enregistrement dans la BD
 
@@ -264,8 +267,6 @@ exports.deleteUser = (req, res, next) => {
 
             // Vérification de l'autorisation de l'utilisateur
 
-            console.log("req.auth.userId", req.auth.userId);
-
             if (req.auth.userId !== user.id) {
                 return res.status(403).json({
                     message: 'Requête non autorisée !'
@@ -278,7 +279,7 @@ exports.deleteUser = (req, res, next) => {
                     }
                 })
                 .then(() => res.status(200).json({
-                    message: `Compte de ${user.username} supprimé !`
+                    message: `Compte supprimé !`
                 }))
                 .catch(error => res.status(400).json({
                     message: error.message
@@ -292,4 +293,114 @@ exports.deleteUser = (req, res, next) => {
             });
         });
 
+};
+
+// ********** Mise à jour du profil **********
+// *******************************************
+
+exports.updateUser = async (req, res, next) => {
+
+    // Vérification si le pseudo existe déjà
+
+    const reqUsername = req.file ? JSON.parse(req.body.user).username : req.body.username;
+
+    const isUsernameAvailable = await db.User.findOne({
+        where: {
+            username: reqUsername 
+        }
+    });
+
+    if (isUsernameAvailable) {
+        return res.status(400).json({
+            message: `le pseudo est déjà pris`
+        });
+    }
+    
+    // Récupération dans la BD des infos de l'utilisateur qui correspond à l'id dans la requête
+
+    db.User.findOne({
+            where: {
+                id: req.params.id
+            }
+        })
+        .then(user => {
+           
+            // Vérification de l'existence de l'utilisateur
+
+            if (user === null) {
+                return res.status(401).json({
+                    message: 'Utilisateur non trouvé !'
+                });
+            }
+
+            // Vérification de l'autorisation de l'utilisateur
+
+            if (req.auth.userId !== user.id) {
+                return res.status(403).json({
+                    message: 'Requête non autorisée !'
+                });
+            }
+
+            // Vérification présence image dans la requête
+
+            let userObj;
+
+            if (req.file) {
+
+                const filename = user.avatar.split('/images/')[1];
+
+                if (filename !== 'default-avatar.png') {
+
+                    // Suppression de l'ancienne image du dossier images
+                    
+                    fs.unlink(`images/${filename}`, error => {
+                        if (error) throw error;
+                        console.log('Ancienne image de profil effacée !');
+                    });
+
+                }
+
+                // Traitement de l'objet avec nouvelle image
+
+                userObj = {
+                    ...JSON.parse(req.body.user),
+                    avatar: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+                };
+
+            } else {
+
+                // Récupération des données sans chargement d'image
+
+                userObj = { ...req.body };
+
+            }
+
+            // Mise à jour du profil de l'utilisateur
+
+            db.User.update({
+                ...userObj
+            }, {
+                where: {
+                    id: req.params.id
+                }
+            })
+            .then(() => res.status(200).json({
+                message: 'Profil mis à jour !',
+                modifications: userObj
+            }))
+            .catch(error => {
+                    
+                const errorMessage = error.errors[0].message;
+
+                res.status(400).json({
+                    message: errorMessage
+            }
+            )});
+
+        })
+        .catch(error => {
+            res.status(404).json({
+                message: error.message
+            });
+        });
 };
