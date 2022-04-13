@@ -110,7 +110,7 @@ exports.signin = (req, res, next) => {
                     }
                     // Renvoi du token encodé contenant le userId
                     res.status(200).json({
-                        userId: user.id,
+                        user: user,
                         token: jwt.sign({
                                 userId: user.id
                             },
