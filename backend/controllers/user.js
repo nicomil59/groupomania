@@ -189,6 +189,8 @@ exports.getUser = (req, res, next) => {
 
 exports.updatePwdUser = (req, res, next) => {
 
+    console.log(req.body)
+    
     // Récupération dans la BD des infos de l'utilisateur qui correspond à l'id dans la requête
 
     db.User.findOne({
@@ -214,29 +216,78 @@ exports.updatePwdUser = (req, res, next) => {
                 });
             }
 
-            // Hachage du nouveau mot de passe avant enregistrement dans la BD
+            // Vérification de la validité du nouveau mot de passe
 
-            bcrypt.hash(req.body.password, 10)
-                .then(hash => {
+            if (!isPasswordValid(req.body.newPassword)) {
 
-                    db.User.update({
-                            password: hash
-                        }, {
-                            where: {
-                                id: req.params.id
-                            }
+                return res.status(400).json({
+                    message: validationMessages(req.body.newPassword)
+                });
+            }
+
+            // Comparaison current password et password de BD
+
+            bcrypt.compare(req.body.currentPassword, user.password)
+                .then(valid => {
+                    if (!valid) {
+                        return res.status(401).json({
+                            message: 'Mot de passe actuel incorrect !'
+                        });
+                    }
+
+                    // Hachage du nouveau mot de passe avant enregistrement dans la BD
+
+                    bcrypt.hash(req.body.newPassword, 10)
+                        .then(hash => {
+
+                            db.User.update({
+                                    password: hash
+                                }, {
+                                    where: {
+                                        id: req.params.id
+                                    }
+                                })
+                                .then(() => res.status(200).json({
+                                    message: 'Mise à jour du mot de passe effectuée !'
+                                }))
+                                .catch(error => res.status(400).json({
+                                    message: error.message
+                                }));
+
                         })
-                        .then(() => res.status(200).json({
-                            message: 'Mise à jour du mot de passe effectuée !'
-                        }))
-                        .catch(error => res.status(400).json({
+                        .catch(error => res.status(500).json({
                             message: error.message
                         }));
 
+                    
                 })
                 .catch(error => res.status(500).json({
                     message: error.message
                 }));
+
+            // Hachage du nouveau mot de passe avant enregistrement dans la BD
+
+            // bcrypt.hash(req.body.password, 10)
+            //     .then(hash => {
+
+            //         db.User.update({
+            //                 password: hash
+            //             }, {
+            //                 where: {
+            //                     id: req.params.id
+            //                 }
+            //             })
+            //             .then(() => res.status(200).json({
+            //                 message: 'Mise à jour du mot de passe effectuée !'
+            //             }))
+            //             .catch(error => res.status(400).json({
+            //                 message: error.message
+            //             }));
+
+            //     })
+            //     .catch(error => res.status(500).json({
+            //         message: error.message
+            //     }));
 
         })
         .catch(error => {

@@ -4,6 +4,7 @@ import Signup from '../components/Signup.vue'
 import Login from '../components/Login.vue'
 import ViewProfile from '../components/ViewProfile.vue'
 import ModifyProfile from '../components/ModifyProfile.vue'
+import ModifyPassword from '../components/ModifyPassword.vue'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/modify-profile/:id',
     name: 'modify-profile',
     component: ModifyProfile
+  },
+  {
+    path: '/modify-password/:id',
+    name: 'modify-password',
+    component: ModifyPassword
   },
   {
     path: '/about',

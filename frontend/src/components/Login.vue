@@ -67,7 +67,7 @@ export default {
       }
     },
     resetErrorMessage() {
-      console.log('hello you')
+      console.log('reset error message')
       this.valid = true;
     }
   }

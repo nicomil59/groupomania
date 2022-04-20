@@ -6,16 +6,17 @@
       <form @submit.prevent="handleSubmit">
         <div class="mb-3">
           <label for="usernameInput" class="form-label">Pseudo</label>
-          <input v-model="username" type="text" class="form-control" id="usernameInput" />
+          <input v-model="username" @click="resetErrorMessage" type="text" class="form-control" id="usernameInput" />
         </div>
         <div class="mb-3">
           <label for="emailInput" class="form-label">Email</label>
-          <input v-model="email" type="email" class="form-control" id="emailInput" />
+          <input v-model="email" @click="resetErrorMessage" type="email" class="form-control" id="emailInput" />
         </div>
         <div class="mb-3">
           <label for="passwordInput" class="form-label">Mot de passe</label>
-          <input v-model="password" type="password" class="form-control" id="passwordInput" />
+          <input v-model="password" @click="resetErrorMessage" type="password" class="form-control" id="passwordInput" />
         </div>
+        <p v-if="!valid" id="errorMessageId">{{ errorMessage }}</p>
         <button type="submit" class="btn btn-primary">Créer un compte</button>
         <p class="mt-3">Déjà un compte ? <router-link to="/login">Connexion</router-link></p>
       </form>
@@ -32,7 +33,9 @@ export default {
     return {
       username: '',
       email: '',
-      password: ''
+      password: '',
+      valid: true,
+      errorMessage: ''
     }
   },
   // props: {
@@ -53,9 +56,18 @@ export default {
         this.$router.push('/login');
         
       } catch (error) {
-        console.log(error)
+          console.log(error.response.data);
+          this.valid = false;
+          if (error.response.data.message.includes('The string')) {
+            this.errorMessage = "Votre mot de passe doit contenir 8 caractères au minimum, contenir des lettres (majuscule et minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.";
+          } else {
+            this.errorMessage = error.response.data.message;
+          }
       }
-
+    },
+    resetErrorMessage() {
+      console.log('reset error message')
+      this.valid = true;
     }
   }
 };
@@ -72,6 +84,10 @@ h1 {
   font-weight: 700;
   text-align: center;
   font-size: 50px;
+}
+
+#errorMessageId {
+  color: red;
 }
 
 

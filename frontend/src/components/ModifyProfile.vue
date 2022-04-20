@@ -19,8 +19,9 @@
             <label for="avatarInput" class="form-label">Avatar</label>
             <input class="form-control" type="file" id="avatarInput" @change="onFileSelected">
         </div>
-        <a @click="abort" class="btn btn-light">Retour</a>
-        <button type="submit" class="btn btn-primary">Sauvegarder</button>
+        <a @click="abort" class="btn btn-light btn-space">Retour</a>
+        <button type="submit" class="btn btn-primary btn-space">Sauvegarder</button>
+        <router-link :to="`/modify-password/${userId}`" class="btn btn-primary">Changer de mot de passe</router-link>
       </form>
       <p v-if="isUpdated">Les modifications ont bien été enregistrées !</p>
     </div>
@@ -126,11 +127,6 @@ export default {
   font-weight: bold !important;
 }
 
-.img-avatar {
-  width: 100px !important;
-  height: auto;
-}
-
 .container-compo {
   max-width: 500px;
   margin-top: 10%;
@@ -141,13 +137,12 @@ h1 {
   text-align: center;
 }
 
-.card-btns {
-  display: flex;
-  gap: 20px;
-}
-
 .avatar {
     width: 200px;
     height: 200px;
+}
+
+.btn-space {
+  margin-right: 10px;
 }
 </style>
