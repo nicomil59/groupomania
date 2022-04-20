@@ -35,12 +35,13 @@
               <router-link :to="`/modify-profile/${userId}`" class="btn btn-primary" v-if="!loggedIn">Modifier</router-link>
               <!-- <router-link to="/login" class="nav-link login-link">Se connecter</router-link> -->
               <!-- <a href="#" class="btn btn-primary">Modifier</a> -->
-              <a href="#" class="btn btn-danger">Supprimer</a>
+              <a href="javascript:void(0)" @click="deleteUser" class="btn btn-danger">Supprimer</a>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <p v-if="isDeleted">Compte supprimé !</p>
 
     <!-- <div v-if="!user"> -->
     <!-- <h1>View Profile</h1>
@@ -65,20 +66,46 @@ export default {
       email: "",
       bio: "",
       avatar: "",
-      userId: ""
+      userId: "",
+      isDeleted: false
     };
   },
   computed: {
     ...mapGetters(["user"]),
     ...mapGetters(['loggedIn']),
   },
-  // created() {
-  //   console.log(this.$store.state.logged);
-  //   if(!this.$store.state.logged) {
-  //     console.log("pas connecté !!!")
-  //     this.$router.push('/login');
-  //   }
-  // },
+  methods: {
+    async deleteUser() {
+
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      try {
+        const response = await axios.delete(`${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }});
+        console.log(response.data);
+
+        localStorage.removeItem('userId');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // this.$store.dispatch('setUser', null);
+        this.$store.dispatch('setLogout');
+
+        this.isDeleted = true;
+
+        // redirection vers la page d'inscription
+        setTimeout(() => {
+          this.$router.push('/signup');
+        }, 1500);
+        
+
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    }
+  },
   async beforeMount() {
     console.log('beforemount')
     

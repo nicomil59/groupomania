@@ -274,6 +274,20 @@ exports.deleteUser = (req, res, next) => {
                 });
             }
 
+            const filename = user.avatar.split('/images/')[1];
+            console.log('filename image à supprimer', filename);
+
+            if (filename !== 'default-avatar.png') {
+
+                // Suppression de l'image du dossier images
+                
+                fs.unlink(`images/${filename}`, error => {
+                    if (error) throw error;
+                    console.log('Image de profil effacée !');
+                });
+
+            }
+
             db.User.destroy({
                     where: {
                         id: req.params.id
