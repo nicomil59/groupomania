@@ -110,6 +110,7 @@ exports.signin = (req, res, next) => {
                     }
                     // Renvoi du token encodé contenant le userId
                     res.status(200).json({
+                        userId: user.id,
                         user: user,
                         token: jwt.sign({
                                 userId: user.id
@@ -302,19 +303,19 @@ exports.updateUser = async (req, res, next) => {
 
     // Vérification si le pseudo existe déjà
 
-    const reqUsername = req.file ? JSON.parse(req.body.user).username : req.body.username;
+    // const reqUsername = req.file ? JSON.parse(req.body.user).username : req.body.username;
 
-    const isUsernameAvailable = await db.User.findOne({
-        where: {
-            username: reqUsername 
-        }
-    });
+    // const isUsernameAvailable = await db.User.findOne({
+    //     where: {
+    //         username: reqUsername 
+    //     }
+    // });
 
-    if (isUsernameAvailable) {
-        return res.status(400).json({
-            message: `le pseudo est déjà pris`
-        });
-    }
+    // if (isUsernameAvailable) {
+    //     return res.status(400).json({
+    //         message: `le pseudo est déjà pris`
+    //     });
+    // }
     
     // Récupération dans la BD des infos de l'utilisateur qui correspond à l'id dans la requête
 
@@ -325,6 +326,10 @@ exports.updateUser = async (req, res, next) => {
         })
         .then(user => {
            
+            console.log("user from server", user);
+            console.log("req file", req.file);
+            console.log("req body", req.body);
+            
             // Vérification de l'existence de l'utilisateur
 
             if (user === null) {
@@ -386,7 +391,7 @@ exports.updateUser = async (req, res, next) => {
             })
             .then(() => res.status(200).json({
                 message: 'Profil mis à jour !',
-                modifications: userObj
+                updatedData: userObj
             }))
             .catch(error => {
                     

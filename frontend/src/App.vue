@@ -28,7 +28,6 @@ export default {
     try {
       // const response = await axios.get(`${userId}`);
       // console.log(response.data);
-      // this.user = response.data;
       // this.$store.dispatch('user', response.data);
     }
     catch (error) {

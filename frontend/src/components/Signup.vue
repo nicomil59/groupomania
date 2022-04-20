@@ -2,7 +2,6 @@
   <div class="container-compo mx-auto">
     <div class="container mt-5">
       <h1>Inscription</h1>
-      <p>{{ msg }}</p>
 
       <form @submit.prevent="handleSubmit">
         <div class="mb-3">
@@ -36,9 +35,9 @@ export default {
       password: ''
     }
   },
-  props: {
-    msg: String,
-  },
+  // props: {
+  //   msg: String,
+  // },
   methods: {
     async handleSubmit() {
       const dataInput = {
@@ -72,9 +71,8 @@ export default {
 h1 {
   font-weight: 700;
   text-align: center;
+  font-size: 50px;
 }
 
-button {
-  font-weight: bold;
-}
+
 </style>

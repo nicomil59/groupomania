@@ -13,9 +13,19 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'HomeView',
-  // props: ['user']
   computed: {
     ...mapGetters(['user'])
+  },
+  mounted() {
+    console.log("logged", this.$store.state.logged);
+    const isLogged = this.$store.state.logged;
+
+    if(!isLogged) {
+      setTimeout(() => {
+        this.$router.push('/login');
+        
+      }, 1500);
+    }
   }
 }
 </script>

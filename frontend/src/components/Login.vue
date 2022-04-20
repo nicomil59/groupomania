@@ -2,18 +2,18 @@
   <div class="container-compo mx-auto">
     <div class="container">
       <h1>Connexion</h1>
-      <p>{{ msg }}</p>
 
       <form  @submit.prevent="handleSubmit">
         <div class="mb-3">
           <label for="usernameInput" class="form-label">Pseudo</label>
-          <input v-model="username" type="text" class="form-control" id="usernameInput" />
+          <input @click="resetErrorMessage" v-model="username" type="text" class="form-control" id="usernameInput" />
         </div>
         <div class="mb-3">
           <label for="passwordInput" class="form-label">Mot de passe</label>
-          <input v-model="password" type="password" class="form-control" id="passwordInput" />
+          <input @click="resetErrorMessage" v-model="password" type="password" class="form-control" id="passwordInput" />
         </div>
-        <button type="submit" class="btn btn-primary">Se Connecter</button>
+        <p v-if="!valid" id="errorMessageId">{{ errorMessage }}</p>
+        <button type="submit" class="btn btn-primary">Se connecter</button>
         <p class="mt-3">Pas encore de compte ? <router-link to="/signup">Inscription</router-link></p>
       </form>
     </div>
@@ -28,12 +28,14 @@ export default {
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      valid: true,
+      errorMessage: ''
     }
   },
-  props: {
-    msg: String,
-  },
+  // props: {
+  //   msg: String,
+  // },
   methods: {
     async handleSubmit() {
       const dataInput = {
@@ -44,18 +46,29 @@ export default {
 
       try {
         const response = await axios.post('signin', dataInput);
-        
+
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userId', response.data.user.id);
+        localStorage.setItem('userId', response.data.userId);
+        // localStorage.setItem('user', response.data.user);
+        localStorage.setItem("user", JSON.stringify(response.data.user))
 
         console.log(response.data.user)
 
-        this.$store.dispatch('user', response.data.user);
+        this.$store.dispatch('setUser', response.data.user);
+
+        this.$store.dispatch('setLogin');
+
         this.$router.push('/');
 
       } catch (error) {
-        console.log(error)
+          console.log(error.response.data);
+          this.valid = false;
+          this.errorMessage = error.response.data.message;
       }
+    },
+    resetErrorMessage() {
+      console.log('hello you')
+      this.valid = true;
     }
   }
 };
@@ -71,9 +84,12 @@ export default {
 h1 {
   font-weight: 700;
   text-align: center;
+  font-size: 50px;
 }
 
-button {
-  font-weight: bold;
+#errorMessageId {
+  color: red;
 }
+
+
 </style>
