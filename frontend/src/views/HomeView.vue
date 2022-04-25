@@ -7,8 +7,6 @@
 
 <script>
 // @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
-// import axios from 'axios';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -17,13 +15,14 @@ export default {
     ...mapGetters(['user'])
   },
   mounted() {
+    console.log(this.$store.state.user);
+    
     console.log("logged", this.$store.state.logged);
     const isLogged = this.$store.state.logged;
 
     if(!isLogged) {
       setTimeout(() => {
         this.$router.push('/login');
-        
       }, 1500);
     }
   }

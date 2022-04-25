@@ -1,19 +1,19 @@
 <template>
   <div class="container-compo mx-auto">
     <div class="container">
-      <h1>Connexion</h1>
+      <h1 class="mb-4">Connexion</h1>
 
       <form  @submit.prevent="handleSubmit">
         <div class="mb-3">
           <label for="usernameInput" class="form-label">Pseudo</label>
-          <input @click="resetErrorMessage" v-model="username" type="text" class="form-control" id="usernameInput" />
+          <input @click="resetErrorMessage" v-model="username" type="text" class="form-control" id="usernameInput" required />
         </div>
-        <div class="mb-3">
+        <div class="mb-4">
           <label for="passwordInput" class="form-label">Mot de passe</label>
-          <input @click="resetErrorMessage" v-model="password" type="password" class="form-control" id="passwordInput" />
+          <input @click="resetErrorMessage" v-model="password" type="password" class="form-control" id="passwordInput" required />
         </div>
-        <p v-if="!valid" id="errorMessageId">{{ errorMessage }}</p>
-        <button type="submit" class="btn btn-primary">Se connecter</button>
+        <p v-if="!valid" id="errorMessageId" class="validFeedback">{{ errorMessage }}</p>
+        <button type="submit" class="btn btn-primary btn-groupo">Se connecter</button>
         <p class="mt-3">Pas encore de compte ? <router-link to="/signup">Inscription</router-link></p>
       </form>
     </div>
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import Api from '../services/Api';
 
 export default {
   name: "LogIn",
@@ -33,31 +33,23 @@ export default {
       errorMessage: ''
     }
   },
-  // props: {
-  //   msg: String,
-  // },
   methods: {
     async handleSubmit() {
       const dataInput = {
         username: this.username,
         password: this.password
       }
-      console.log(dataInput)
+      console.log(dataInput);
 
       try {
-        const response = await axios.post('signin', dataInput);
+        const response = await Api.post('users/signin', dataInput);
 
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userId', response.data.userId);
-        // localStorage.setItem('user', response.data.user);
-        localStorage.setItem("user", JSON.stringify(response.data.user))
-
-        console.log(response.data.user)
+        localStorage.setItem("user", JSON.stringify(response.data.user));
 
         this.$store.dispatch('setUser', response.data.user);
-
         this.$store.dispatch('setLogin');
-
         this.$router.push('/');
 
       } catch (error) {
@@ -67,7 +59,6 @@ export default {
       }
     },
     resetErrorMessage() {
-      console.log('reset error message')
       this.valid = true;
     }
   }
@@ -75,21 +66,18 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-.container-compo {
-  max-width: 500px;
-  margin-top: 10%;
-}
+<style scoped>
+  .container-compo {
+    max-width: 500px;
+    margin-top: 5%;
+  }
 
-h1 {
-  font-weight: 700;
-  text-align: center;
-  font-size: 50px;
-}
+  h1 {
+    font-weight: 700;
+    text-align: center;
+  }
 
-#errorMessageId {
-  color: red;
-}
-
-
+  .validFeedback {
+    color: red;
+  }
 </style>

@@ -1,51 +1,56 @@
 <template>
   <div class="container-compo mx-auto">
     <div class="container mt-5">
-      <h1>Modification du profil</h1>
+      <h1 class="mb-4">Modification du profil</h1>
 
       <form @submit.prevent="handleSubmit" id="myForm" enctype="multipart/form-data">
         <div class="mb-3">
           <label for="usernameInput" class="form-label">Pseudo</label>
-          <input v-model="username" type="text" class="form-control" id="usernameInput" />
+          <input v-model="username" @click="resetErrorMessage" type="text" class="form-control" id="usernameInput" required />
+        </div>
+        <div class="mb-3">
+          <label for="emailInput" class="form-label">Email</label>
+          <input v-model="email" type="email" class="form-control" id="emailInput" disabled />
         </div>
         <div class="mb-3">
           <label for="bioInput" class="form-label">Bio</label>
-          <input v-model="bio" type="text" class="form-control" id="bioInput" />
+          <textarea v-model="bio" @click="resetErrorMessage" type="text" class="form-control" id="bioInput" rows="5" @input="checkBio" />
         </div>
-        <div class="mb-3 avatar">
-          <img :src="avatar" class="img-fluid rounded-start" alt="avatar" />
-        </div>
-        <div class="mb-3">
+        <p v-if="isBioTooLong" class="validFeedback">La bio ne doit pas dépasser les 255 caractères autorisés</p>
+        <div class="mb-4">
             <label for="avatarInput" class="form-label">Avatar</label>
-            <input class="form-control" type="file" id="avatarInput" @change="onFileSelected">
+            <div class="imagePreviewWrapper mb-3" :style="{'background-image': `url(${previewAvatar})`}" @click="selectImage"></div>
+            <input class="form-control" type="file" id="avatarInput" ref="fileInput" @change="onFileSelected"  @click="resetErrorMessage">
         </div>
+        <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
         <a @click="abort" class="btn btn-light btn-space">Retour</a>
-        <button type="submit" class="btn btn-primary btn-space">Sauvegarder</button>
-        <router-link :to="`/modify-password/${userId}`" class="btn btn-primary">Changer de mot de passe</router-link>
+        <button :disabled="!valid" type="submit" class="btn btn-primary btn-space btn-groupo">Sauvegarder</button>
       </form>
-      <p v-if="isUpdated">Les modifications ont bien été enregistrées !</p>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import axios from "axios";
+import Api from '../services/Api';
 
 export default {
   name: "ModifyProfile",
   data() {
     return {
       username: this.$store.state.user.username,
+      email: this.$store.state.user.email,
       bio: this.$store.state.user.bio,
-      avatar: this.$store.state.user.avatar,
       userId: this.$store.state.user.id,
       selectedFile: null,
-      isUpdated: false
+      valid: true,
+      errorMessage: '',
+      previewAvatar: this.$store.state.user.avatar,
+      isBioTooLong: false
     };
   },
   computed: {
-    ...mapGetters(["user"]),
+    ...mapGetters(["user"])
   },
   methods: {
     async handleSubmit() {
@@ -54,8 +59,6 @@ export default {
         username: this.username,
         bio: this.bio
       }
-      console.log("userInfos", userInfos)
-      
       let body = userInfos;
 
       // si image uploadée, envoi d'un objet formData
@@ -71,7 +74,7 @@ export default {
       const userId = localStorage.getItem("userId");
 
       try {
-        const response = await axios.put(`${userId}`, body, {
+        const response = await Api.put(`users/${userId}`, body, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -79,10 +82,7 @@ export default {
 
         console.log("response data", response.data);
         const updatedData = response.data.updatedData;
-        // const copyUser = {...this.$store.state.user};
         const updatedUser = Object.assign({...this.$store.state.user}, {...updatedData});
-
-        console.log("updatedUser", updatedUser);
         
         // mise à jour de user dans localStorage
         localStorage.setItem("user", JSON.stringify(updatedUser))
@@ -90,32 +90,64 @@ export default {
         // mise à jour de user dans le state
         this.$store.dispatch('setUser', updatedUser);
 
-        // redirection vers la page ViewProfile
-        // setTimeout(() => {
-        //   this.$router.go(-1);
-          
-        // }, 1000);
+        alert('Les modifications ont bien été enregistrées !');
 
-        this.isUpdated = true;
+        // redirection vers la page ViewProfile
+        this.$router.go(-1);
 
       } catch (error) {
-        console.log(error.response.data);
+          console.log(error.response.data);
+          this.valid = false;
+          this.errorMessage = error.response.data.message;
+          
       }
     },
+    selectImage() {
+      this.$refs.fileInput.click()
+    },
     onFileSelected(e) {
-      console.log("event on file selected", e);
-      this.selectedFile = e.target.files[0];
+      const file = e.target.files[0];
+      const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      const MAX_SIZE = 1048576;
+      const tooLarge = file.size > MAX_SIZE;
+
+      if(allowedTypes.includes(file.type) && !tooLarge) {
+        this.selectedFile = e.target.files[0];
+
+        // preview uploaded image
+        let reader = new FileReader;
+        reader.onload = e => {
+          this.previewAvatar = e.target.result;
+        }
+        reader.readAsDataURL(file);
+        this.$emit('input', file);
+
+      } else {
+        this.valid = false;
+        this.errorMessage = tooLarge ? "Fichier trop volumineux : la taille ne doit pas dépasser 1 Mo" : "Seules les images sont autorisées";
+      }
     },
     abort() {
       // redirection vers la page ViewProfile
-        setTimeout(() => {
-          this.$router.go(-1);
-          
-        }, 1000);
+        this.$router.go(-1);
+    },
+    resetErrorMessage() {
+        this.valid = true;
+    },
+    checkBio() {
+      const bioLength = document.getElementById('bioInput').value.length;
+      
+      if (bioLength > 255) {
+        this.isBioTooLong = true;
+        this.valid = false;
+      }  else {
+        this.isBioTooLong = false;
+      }
     }
   },
   mounted() {
-    console.log(this.$store.state.user);
+    // console.log(this.$store.state.user);
+    // console.log(document.getElementById('bioInput').value.length)
   }
 
 };
@@ -123,26 +155,40 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.btn {
-  font-weight: bold !important;
-}
+  .btn {
+    font-weight: bold !important;
+  }
 
-.container-compo {
-  max-width: 500px;
-  margin-top: 10%;
-}
+  .container-compo {
+    max-width: 500px;
+    margin-top: 5%;
+  }
 
-h1 {
-  font-weight: 700;
-  text-align: center;
-}
+  h1 {
+    font-weight: 700;
+    text-align: center;
+  }
 
-.avatar {
-    width: 200px;
-    height: 200px;
-}
+  textarea {
+    resize: none;
+  }
 
-.btn-space {
-  margin-right: 10px;
-}
+  .btn-space {
+    margin-right: 10px;
+  }
+
+  .imagePreviewWrapper {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: block;
+    cursor: pointer;
+    /* margin: 0 auto 30px; */
+    background-size: cover;
+    background-position: center center;
+  }
+
+  .validFeedback {
+    color: red;
+  }
 </style>

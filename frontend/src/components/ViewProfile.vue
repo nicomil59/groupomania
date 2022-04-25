@@ -1,73 +1,41 @@
 <template>
   <div class="container-compo mx-auto">
-    <!-- <div class="card" style="width: 30rem">
-      <img :src="avatar" class="img-avatar" alt="avatar" />
-      <div class="card-body">
-        <h5 class="card-title">Profil</h5>
-        <div class="card-text">
-          <p>Pseudo: {{ username }}</p>
-          <p>Email: {{ email }}</p>
-          <p>Bio: {{ bio }}</p>
-        </div>
-        <div class="card-btns d-flex">
-          <a href="#" class="btn btn-primary">Modifier</a>
-          <a href="#" class="btn btn-danger">Supprimer</a>
-        </div>
-      </div>
-    </div> -->
 
-    <div class="card mb-3" style="max-width: 800px">
-      <div class="row g-0">
-        <div class="col-md-4">
-          <img :src="avatar" class="img-fluid rounded-start" alt="avatar" />
-        </div>
-        <div class="col-md-8">
-          <div class="card-body">
-            <h5 class="card-title">Profil</h5>
-            <div class="card-text">
-              <p>Pseudo: {{ username }}</p>
-              <p>Email: {{ email }}</p>
-              <p>Bio: {{ bio }}</p>
-            </div>
-            <div class="card-btns">
-              <!-- <router-link :to="{name: 'modify-profile', params: { id: user.id }}" class="btn btn-primary">Modifier</router-link> -->
-              <router-link :to="`/modify-profile/${user.id}`" class="btn btn-primary" v-if="loggedIn">Modifier</router-link>
-              <router-link :to="`/modify-profile/${userId}`" class="btn btn-primary" v-if="!loggedIn">Modifier</router-link>
-              <!-- <router-link to="/login" class="nav-link login-link">Se connecter</router-link> -->
-              <!-- <a href="#" class="btn btn-primary">Modifier</a> -->
-              <a href="javascript:void(0)" @click="deleteUser" class="btn btn-danger">Supprimer</a>
-            </div>
-          </div>
+    <h1 class="mb-4">Profil</h1>
+
+    <div class="card mb-4 card-profile">
+      <div class="card-body text-center">
+        <img :src="avatar" class="rounded-circle img-fluid avatar" alt="avatar"/>
+        <h3 class="my-3">{{ username }}</h3>
+        <p class="text-muted mb-3">{{ email }}</p>
+        <p class="mb-4">{{ bio }}</p>
+        <div class="d-flex justify-content-center mb-2 card-btns">
+          <!-- <router-link :to="{name: 'modify-profile', params: { id: user.id }}" class="btn btn-primary">Modifier</router-link> -->
+          <router-link :to="`/modify-profile/${user.id}`" class="btn btn-primary  btn-modify" v-if="loggedIn">Modifier profil</router-link>
+          <!-- <router-link :to="`/modify-profile/${userId}`" class="btn btn-primary  btn-modify" v-if="!loggedIn">Modifier profil</router-link> -->
+          <router-link :to="`/modify-password/${user.id}`" class="btn btn-primary btn-password" v-if="loggedIn">Modifier mot de passe</router-link>
+          <!-- <router-link :to="`/modify-password/${userId}`" class="btn btn-primary btn-password" v-if="!loggedIn">Modifier mot de passe</router-link> -->
+          <a href="javascript:void(0)" @click="deleteUser" class="btn btn-groupo">Supprimer compte</a>
         </div>
       </div>
     </div>
-    <p v-if="isDeleted">Compte supprimé !</p>
 
-    <!-- <div v-if="!user"> -->
-    <!-- <h1>View Profile</h1>
-        <p>Username : {{ user.username }}</p>
-        <p>Email : {{ user.email }}</p>
-        <p>Bio : {{ user.bio }}</p>
-        <img :src="user.avatar" alt="avatar" /> -->
-    <!-- <p>Rien à voir</p> -->
-    <!-- </div> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import axios from "axios";
+import Api from '../services/Api';
 
 export default {
   name: "ViewProfile",
   data() {
     return {
-      username: "",
-      email: "",
-      bio: "",
-      avatar: "",
-      userId: "",
-      isDeleted: false
+      username: '',
+      email: '',
+      bio: '',
+      avatar: '',
+      userId: '',
     };
   },
   computed: {
@@ -80,26 +48,30 @@ export default {
       const token = localStorage.getItem("token");
       const userId = localStorage.getItem("userId");
 
+      let okToDelete = confirm('Vous êtes sûr(e) de supprimer votre compte ?')
+      if(!okToDelete) {
+        return
+      }
+
       try {
-        const response = await axios.delete(`${userId}`, {
+        const response = await Api.delete(`users/${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-            }});
+            }}
+        );
+
         console.log(response.data);
 
         localStorage.removeItem('userId');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // this.$store.dispatch('setUser', null);
+
         this.$store.dispatch('setLogout');
 
-        this.isDeleted = true;
+        alert('Compte supprimé !')
 
         // redirection vers la page d'inscription
-        setTimeout(() => {
           this.$router.push('/signup');
-        }, 1500);
-        
 
       } catch (error) {
         console.log(error.response.data);
@@ -107,63 +79,105 @@ export default {
     }
   },
   async beforeMount() {
-    console.log('beforemount')
     
     const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-
-    // console.log(userId);
+    const userIdFromLocalStorage = localStorage.getItem("userId");
+    const userIdParams = this.$route.params.id;
 
     try {
-      const response = await axios.get(`${userId}`, {
+      
+      if (userIdParams !== userIdFromLocalStorage) {
+        throw Error("Vous n'avez pas l'autorisation d'accéder à cette page");
+      }
+      
+      const response = await Api.get(`users/${userIdParams}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
 
       this.username = response.data.username;
       this.email = response.data.email;
       this.bio = response.data.bio;
       this.avatar = response.data.avatar;
-      this.userId = userId;
+      this.userId = response.data.id;
 
-      // this.$store.dispatch('user', response.data);
+      // Mise à jour de l'email en clair dans le state et le localStorage
+
+      const updatedUser = Object.assign({...this.$store.state.user}, {email: this.email});
+      this.$store.dispatch('setUser', updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
     } catch (error) {
       console.log(error);
+      alert("Accès non autorisé");
+      this.$router.push('/');
+        
     }
   },
   mounted() {
-    // this.$store.dispatch('setToken');
-    // console.log(this.$store.state.logged);
-    // if(this.$store.state.logged) {
-    //   console.log("connecté !!!")
-    // }
-    console.log('mounted')
+    // console.log('mounted')
+    // console.log('params route', this.$route.params.id);
+    // console.log(this.$store.state.user);
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style scoped>
+  .container-compo {
+    max-width: 600px;
+    margin-top: 5%;
+  }
 
-.img-avatar {
-  width: 100px !important;
-  height: auto;
-}
+  h1 {
+    font-weight: 700;
+    text-align: center;
+  }
 
-.container-compo {
-  max-width: 500px;
-  margin-top: 10%;
-}
+  .card-profile {
+    border-radius: 20px;
+  }
 
-h1 {
-  font-weight: 700;
-  text-align: center;
-}
+  .avatar {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+  }
 
-.card-btns {
-  display: flex;
-  gap: 20px;
-}
+  .card-btns {
+    display: flex;
+    gap: 20px;
+  }
+
+  .btn-modify {
+    background-color: #EFEFEF;
+    border-color: #EFEFEF;
+    color: #111 !important;
+  }
+
+  .btn-modify:hover {
+    background-color: #d6d6d6;
+  }
+
+  .btn-password {
+    background-color: #EFEFEF;
+    border-color: #EFEFEF;
+    color: #111 !important;
+  }
+
+  .btn-password:hover {
+    background-color: #d6d6d6;
+  }
+
+  @media screen and (max-width: 768px) {
+    .container-compo {
+      width: 80%;
+    }
+    
+    .card-btns {
+      gap: 20px;
+      flex-direction: column;
+    }
+  }
 </style>

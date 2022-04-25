@@ -27,15 +27,13 @@
                 <button :disabled="isSamePassword || !isConfirmPasswordOK" type="submit"
                     class="btn btn-primary btn-space btn-groupo">Valider</button>
             </form>
-            <p v-if="isUpdated">Le mot de passe a bien été modifié !</p>
 
         </div>
     </div>
 </template>
 
 <script>
-    // import { mapGetters } from "vuex";
-    import axios from "axios";
+    import Api from '../services/Api';
 
     export default {
         name: "ModifyPassword",
@@ -46,7 +44,6 @@
                 confirmPwd: '',
                 valid: true,
                 errorMessage: '',
-                isUpdated: false,
             };
         },
         computed: {
@@ -64,10 +61,7 @@
         methods: {
             abort() {
                 // redirection vers la page ModifyProfile
-                setTimeout(() => {
-                    this.$router.go(-1);
-
-                }, 1000);
+                this.$router.go(-1);
             },
             async handleSubmit() {
 
@@ -75,37 +69,24 @@
                     currentPassword: this.currentPwd,
                     newPassword: this.newPwd
                 }
-                console.log("dataInput", dataInput)
-                console.log(this.$store.state.user)
 
                 const token = localStorage.getItem("token");
                 const userId = localStorage.getItem("userId");
 
                 try {
-                    const response = await axios.put(`${userId}/password`, dataInput, {
+                    const response = await Api.put(`users/${userId}/password`, dataInput, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         }
                     });
 
                     console.log("response data", response.data);
-                    // const updatedUser = Object.assign({
-                    //     ...this.$store.state.user
-                    // }, {
-                    //     ...updatedData
-                    // });
 
-                    // console.log("updatedUser", updatedUser);
+                    alert('Le mot de passe a bien été modifié !');
 
-                    // mise à jour de user dans localStorage
-                    // localStorage.setItem("user", JSON.stringify(updatedUser))
+                    // redirection vers la page ViewProfile
+                    this.$router.go(-1);
 
-                    // mise à jour de user dans le state
-                    // this.$store.dispatch('setUser', updatedUser);
-
-
-
-                    this.isUpdated = true;
 
                 } catch (error) {
                     console.log(error.response.data);
@@ -119,12 +100,9 @@
                 }
             },
             resetErrorMessage() {
-                console.log('reset error message')
                 this.valid = true;
             }
         }
-
-
 
     };
 </script>
@@ -135,20 +113,14 @@
         font-weight: bold !important;
     }
 
-
-
     .container-compo {
         max-width: 500px;
-        margin-top: 10%;
+        margin-top: 5%;
     }
 
     h1 {
         font-weight: 700;
         text-align: center;
-    }
-
-    .notice {
-        font-size: 14px;
     }
 
     .btn-space {

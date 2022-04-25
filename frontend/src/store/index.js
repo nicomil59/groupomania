@@ -37,13 +37,15 @@ export default createStore({
       commit('SET_LOGOUT')
     },
     checkToken({ commit }) {
-      commit;
+      // commit;
       if(localStorage.getItem("token")) {
-        console.log("localstorage token", localStorage.getItem("token"))
+        // console.log("localstorage token", localStorage.getItem("token"))
+        // console.log("localstorage userID", localStorage.getItem("userId"))
+
         commit('SET_LOGIN')
         commit('SET_USER', JSON.parse(localStorage.getItem("user")))
       } else {
-        console.log("localstorage token", localStorage.getItem("token"))
+        // console.log("localstorage token", localStorage.getItem("token"))
         console.log('pas de token')
         commit('SET_LOGOUT')
       }

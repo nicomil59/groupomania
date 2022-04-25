@@ -168,7 +168,7 @@ exports.getUser = (req, res, next) => {
             // Objet avec les données à renvoyer
 
             const userData = {
-                userId: user.id,
+                id: user.id,
                 username: user.username,
                 email: emailDecrypted,
                 bio: user.bio,
@@ -366,6 +366,24 @@ exports.deleteUser = (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
 
+    // Vérification longueur bio
+    
+    const bio = req.file === undefined ? req.body.bio : JSON.parse(req.body.user).bio;
+    console.log("bio", bio);
+    console.log("bio length", bio.length);
+
+    if(bio.length > 255) {
+        return res.status(400).json({
+            message: 'Bio trop longue ! 255 caractères maximum !'
+        });
+    }
+    
+    console.log("req file", req.file);
+    
+
+    console.log("req.body", req.body);
+    
+    
     // Vérification si le pseudo existe déjà
 
     // const reqUsername = req.file ? JSON.parse(req.body.user).username : req.body.username;
@@ -391,9 +409,9 @@ exports.updateUser = async (req, res, next) => {
         })
         .then(user => {
            
-            console.log("user from server", user);
-            console.log("req file", req.file);
-            console.log("req body", req.body);
+            // console.log("user from server", user);
+            // console.log("req file", req.file);
+            // console.log("req body", req.body);
             
             // Vérification de l'existence de l'utilisateur
 
@@ -417,6 +435,14 @@ exports.updateUser = async (req, res, next) => {
 
             if (req.file) {
 
+                // Vérification de la validité du pseudo
+
+                if (!isUsernameValid(req.body.user.username)) {
+                    return res.status(400).json({
+                        message: "Pseudo non valide : doit commencer par une lettre et contenir entre 3 et 30 caractères alphanumériques"
+                    });
+                }
+
                 const filename = user.avatar.split('/images/')[1];
 
                 if (filename !== 'default-avatar.png') {
@@ -439,6 +465,14 @@ exports.updateUser = async (req, res, next) => {
 
             } else {
 
+                // Vérification de la validité du pseudo
+
+                if (!isUsernameValid(req.body.username)) {
+                    return res.status(400).json({
+                        message: "Pseudo non valide : doit commencer par une lettre et contenir entre 3 et 30 caractères alphanumériques"
+                    });
+                }
+                
                 // Récupération des données sans chargement d'image
 
                 userObj = { ...req.body };
@@ -463,7 +497,8 @@ exports.updateUser = async (req, res, next) => {
                 const errorMessage = error.errors[0].message;
 
                 res.status(400).json({
-                    message: errorMessage
+                    message: errorMessage,
+                    error: error
             }
             )});
 

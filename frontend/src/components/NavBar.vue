@@ -28,23 +28,16 @@
             <router-link to="/signup" class="nav-link signup-link">S'inscrire</router-link>
           </li>
         </ul>
-        <!-- <div>
-          <p v-if="loggedIn">loggedIn !</p>
-          <p v-else>loggedOut !</p>
-        </div> -->
         <ul class="navbar-nav ms-auto" v-if="loggedIn">
-          <!-- <li class="nav-item">
-            <router-link :to="{name: 'view-profile', params: { id: user.id }}" class="nav-link">Profil</router-link>
-          </li> -->
           <li class="nav-item">
-            <router-link :to="{name: 'view-profile', params: { id: user.id }}" class="nav-link" data-toggle="tooltip" data-placement="bottom" :title="'Profil de ' + user.username">
+            <router-link :to="{name: 'view-profile', params: { id: user.id }}" class="nav-link profile-link" data-toggle="tooltip" data-placement="bottom" :title="'Profil de ' + user.username">
               <div class="avatar-container">
                 <img :src="user.avatar" alt="avatar account">
               </div>
             </router-link>
           </li>
           <li class="nav-item nav-item-logout">
-            <a href="javascript:void(0)" @click="handleClick" class="nav-link">Se déconnecter</a>
+            <a href="javascript:void(0)" @click="logOut" class="nav-link logout-link">Se déconnecter</a>
           </li>
         </ul>
       </div>
@@ -57,16 +50,16 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: "NavBar",
-  // props: ['user'],
   methods: {
-    handleClick() {
+    logOut() {
       localStorage.removeItem('userId');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      this.$store.dispatch('setUser', null);
 
+      this.$store.dispatch('setUser', null);
       this.$store.dispatch('setLogout');
 
+      alert('Vous êtes déconnecté(e) !');
       this.$router.push('/login');
     }
   },
@@ -75,78 +68,91 @@ export default {
     ...mapGetters(['loggedIn']),
   },
   beforeMount() {
-    console.log('beforeMount');
     this.$store.dispatch('checkToken');
-    
   }
 };
 </script>
 
-<style lang="scss" scoped>
-nav {
-  padding: 30px;
+<style scoped>
 
-  img {
-      height: 50px;
+  .navbar {
+    border-bottom: 1px solid #EFEFEF;
+    padding: 30px;
   }
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    margin-right: 10px;
+  .navbar-nav {
+    gap: 30px;
+  }
 
-    &.router-link-exact-active {
-      color: #42b983;
+  .navbar img {
+    height: 50px;
+  }
+
+  .nav-item {
+    font-weight: bold;
+  }
+
+  .nav-link {
+    display: inline-block;
+  }
+
+  .login-link, .signup-link, .logout-link {
+    padding: 8px 12px !important;
+    border-radius: 24px;
+  }
+
+  .login-link, .logout-link {
+    background-color: #FD5835;
+    color: #fff !important;
+  }
+
+  .login-link:hover, .logout-link:hover  {
+    background-color: #c1442b;
+  }
+
+  .signup-link {
+    background-color: #EFEFEF;
+    color: #111 !important;
+  }
+
+  .signup-link:hover {
+    background-color: #d6d6d6;
+  }
+
+  .avatar-container {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .avatar-container img {
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-link {
+    border-radius: 50%;
+  }
+  .profile-link:hover {
+    background-color: #EFEFEF;
+  }
+
+  .nav-item-logout {
+    display: flex;
+    align-items: center;
+  }
+
+  @media screen and (max-width: 992px) {
+    .navbar-nav {
+      margin-top: 25px;
+      gap: 15px;
+      align-items: center;
+    }
+    .nav-link {
+      padding: 0.5rem;
     }
   }
-}
-
-.navbar {
-  border-bottom: 1px solid #EFEFEF;
-}
-
-.nav-item:first-child {
-  margin-right: 30px;
-}
-
-.login-link, .signup-link {
-  padding: 8px 12px !important;
-  border-radius: 24px;
-}
-
-.login-link {
-  background-color: #FD5835;
-  color: #fff !important;
-}
-
-.login-link:hover {
-  background-color: #c1442b;
-}
-
-.signup-link {
-  background-color: #EFEFEF;
-  color: #111 !important;
-}
-
-.signup-link:hover {
-  background-color: #d6d6d6;
-}
-
-.avatar-container {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-.avatar-container img {
-  border-radius: 50%;
-  border: 2px solid #FD5835;
-  width: 100%;
-  height: 100%;
-}
-
-.nav-item-logout {
-  display: flex;
-  align-items: center;
-}
 </style>
