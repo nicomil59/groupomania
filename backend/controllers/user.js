@@ -265,30 +265,6 @@ exports.updatePwdUser = (req, res, next) => {
                     message: error.message
                 }));
 
-            // Hachage du nouveau mot de passe avant enregistrement dans la BD
-
-            // bcrypt.hash(req.body.password, 10)
-            //     .then(hash => {
-
-            //         db.User.update({
-            //                 password: hash
-            //             }, {
-            //                 where: {
-            //                     id: req.params.id
-            //                 }
-            //             })
-            //             .then(() => res.status(200).json({
-            //                 message: 'Mise à jour du mot de passe effectuée !'
-            //             }))
-            //             .catch(error => res.status(400).json({
-            //                 message: error.message
-            //             }));
-
-            //     })
-            //     .catch(error => res.status(500).json({
-            //         message: error.message
-            //     }));
-
         })
         .catch(error => {
             res.status(404).json({
@@ -364,41 +340,17 @@ exports.deleteUser = (req, res, next) => {
 // ********** Mise à jour du profil **********
 // *******************************************
 
-exports.updateUser = async (req, res, next) => {
+exports.updateUser = (req, res, next) => {
 
     // Vérification longueur bio
     
     const bio = req.file === undefined ? req.body.bio : JSON.parse(req.body.user).bio;
-    console.log("bio", bio);
-    console.log("bio length", bio.length);
 
     if(bio.length > 255) {
         return res.status(400).json({
             message: 'Bio trop longue ! 255 caractères maximum !'
         });
     }
-    
-    console.log("req file", req.file);
-    
-
-    console.log("req.body", req.body);
-    
-    
-    // Vérification si le pseudo existe déjà
-
-    // const reqUsername = req.file ? JSON.parse(req.body.user).username : req.body.username;
-
-    // const isUsernameAvailable = await db.User.findOne({
-    //     where: {
-    //         username: reqUsername 
-    //     }
-    // });
-
-    // if (isUsernameAvailable) {
-    //     return res.status(400).json({
-    //         message: `le pseudo est déjà pris`
-    //     });
-    // }
     
     // Récupération dans la BD des infos de l'utilisateur qui correspond à l'id dans la requête
 
@@ -409,10 +361,6 @@ exports.updateUser = async (req, res, next) => {
         })
         .then(user => {
            
-            // console.log("user from server", user);
-            // console.log("req file", req.file);
-            // console.log("req body", req.body);
-            
             // Vérification de l'existence de l'utilisateur
 
             if (user === null) {
