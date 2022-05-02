@@ -5,7 +5,7 @@
         <img
           src="../assets/icon-left-font.png"
           alt="logo Groupomania"
-          class="d-inline-block align-text-top"
+          class="d-inline-block align-text-top logo"
         />
       </router-link>
       <button
@@ -60,7 +60,7 @@ export default {
       this.$store.dispatch('setLogout');
 
       alert('Vous êtes déconnecté(e) !');
-      this.$router.push('/login');
+      this.$router.push('/');
     }
   },
   computed: {
@@ -69,7 +69,7 @@ export default {
   },
   beforeMount() {
     this.$store.dispatch('checkToken');
-  }
+  }  
 };
 </script>
 
@@ -80,12 +80,12 @@ export default {
     padding: 30px;
   }
 
-  .navbar-nav {
-    gap: 30px;
+  .navbar .logo {
+    height: 50px;
   }
 
-  .navbar img {
-    height: 50px;
+  .navbar-nav {
+    gap: 30px;
   }
 
   .nav-item {
@@ -153,6 +153,13 @@ export default {
     }
     .nav-link {
       padding: 0.5rem;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    .navbar .logo {
+      width: 130px;
+      height: 30px;
     }
   }
 </style>

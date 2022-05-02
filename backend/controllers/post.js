@@ -40,9 +40,9 @@ exports.createPost = (req, res, next) => {
     // Enregistrement du post dans la BD
   
     db.Post.create({
-        UserId: req.auth.userId,
+        userId: req.auth.userId,
         content: postObj.content,
-        link: postObj.link,
+        // link: postObj.link,
         imageUrl: postObj.imageUrl
      })
      .then(() => res.status(201).json({
@@ -64,8 +64,8 @@ exports.createPost = (req, res, next) => {
 exports.getAllPosts = (req, res, next) => {
     
     db.Post.findAll({
-        order: [['createdAt', 'DESC'],],
-        attributes: ['id', 'content', 'imageUrl', 'link', 'createdAt'],
+        order: [['updatedAt', 'DESC'],],
+        attributes: ['id', 'content', 'imageUrl', 'createdAt', 'updatedAt'],
         include: [
             {
                 model: db.User,
@@ -97,7 +97,7 @@ exports.getOnePost = (req, res, next) => {
         where: {
             id: req.params.id
         },
-        attributes: ['id', 'content', 'imageUrl', 'link', 'createdAt'],
+        attributes: ['id', 'content', 'imageUrl', 'createdAt', 'updatedAt'],
         include: [
             {
                 model: db.User,
@@ -133,8 +133,8 @@ exports.getMyPosts = (req, res, next) => {
         where: {
             userId: req.auth.userId
         },
-        order: [['createdAt', 'DESC'],],
-        attributes: ['id', 'userId', 'content', 'imageUrl', 'link', 'createdAt']
+        order: [['updatedAt', 'DESC'],],
+        attributes: ['id', 'userId', 'content', 'imageUrl', 'createdAt', 'updatedAt']
     })
     .then(posts => {
         
@@ -243,7 +243,7 @@ exports.updatePost = (req, res, next) => {
     console.log("req file", req.file);
     console.log("req.body", req.body);
 
-    // Vérification si le contenu du message est vide
+    // Vérification de l'existence d'un fichier
 
     const content = req.file === undefined ? req.body.content : JSON.parse(req.body.post).content;
 
@@ -277,8 +277,12 @@ exports.updatePost = (req, res, next) => {
         }
 
         // Suppression de l'ancienne image du dossier images si elle existe
-
-        if(post.imageUrl !== null) {
+        
+        // Condition = il y avait déjà une image et on a une nouvelle image uploadée ou on souhaite supprimer l'image
+        
+        const deleteImg = req.body.deleteImg;
+        
+        if((post.imageUrl !== null) && (req.file ||  deleteImg)) {
                 
             const filename = post.imageUrl.split('/images/')[1];
 
@@ -303,12 +307,13 @@ exports.updatePost = (req, res, next) => {
 
         } else {
 
-            // Traitement de l'objet sans image
+            // Traitement de l'objet sans image uploadée
+
+            const imageUrl = deleteImg ? null : post.imageUrl;
 
             postObj = { 
                 content: req.body.content,
-                link: req.body.link,
-                imageUrl: null
+                imageUrl: imageUrl
             };
 
         }
