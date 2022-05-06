@@ -4,7 +4,8 @@ export default createStore({
   state: {
     user: null,
     logged: false,
-    isToken: false
+    isToken: false,
+    posts: []
   },
   getters: {
     user(state) {
@@ -24,6 +25,10 @@ export default createStore({
     SET_LOGOUT(state) {
       state.logged = false
       state.user = null
+      state.posts = []
+    },
+    SET_POSTS(state, posts) {
+      state.posts = posts
     }
   },
   actions: {
@@ -35,6 +40,9 @@ export default createStore({
     },
     setLogout({ commit }) {
       commit('SET_LOGOUT')
+    },
+    setPosts(context, posts) {
+      context.commit('SET_POSTS', posts)
     },
     checkToken({ commit }) {
       // commit;

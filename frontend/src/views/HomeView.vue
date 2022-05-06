@@ -1,8 +1,9 @@
 <template>
   <div class="container-compo mx-auto">
     <div v-if="user" class="wall mx-auto">
+      <h1 class="wall-title my-4">Le fil d'actualité</h1>
       <NewPost />
-      <Feed  />
+      <Feed />
     </div>
     <div v-else class="welcome mx-auto">
       <img src="../assets/icon-above-font.png" alt="logo Groupomania" class="logo mx-auto d-block">
@@ -18,7 +19,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import Feed from "@/components/Feed.vue";
 import NewPost from "@/components/NewPost.vue";
 import { mapGetters } from 'vuex';
@@ -33,30 +33,28 @@ export default {
     ...mapGetters(['user'])
   },
   mounted() {
-    // console.log(this.$store.state.user);
-    
     console.log("logged", this.$store.state.logged);
-    // const isLogged = this.$store.state.logged;
-
-    // if(!isLogged) {
-    //   setTimeout(() => {
-    //     this.$router.push('/login');
-    //   }, 1500);
-    // }
+  },
+  updated() {
+    console.log('HomeView mis à jour !')
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .container-compo {
-    margin-top: 2%;
+    margin-top: 5%;
   }
 
   .wall {
     max-width: 680px;
     width: 80%;
   }
+
+  .wall-title{
+    font-weight: 700;
+    text-align: center;
+  } 
 
   .welcome {
     padding: 0 25px;
@@ -110,7 +108,7 @@ export default {
   @media screen and (max-width: 768px) {
     .wall {
       max-width: 680px;
-      width: 90%;
+      width: 95%;
     }
     
     .welcome-btns {

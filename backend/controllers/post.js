@@ -9,31 +9,43 @@ exports.createPost = (req, res, next) => {
     console.log('req file', req.file);
     console.log('req auth', req.auth.userId);
 
-    // Vérification si le contenu du message est vide
-
-    const content = req.file === undefined ? req.body.content : JSON.parse(req.body.post).content;
-
-    if (content === '' || content === null) {
-        return res.status(400).json({
-            message: "Le contenu du message ne peut être vide"
-        });
-    }
-    
     // Vérification présence image dans la requête
 
     let postObj;
 
     if (req.file) {
 
+        const content = JSON.parse(req.body.post).content.trim();
+
+        // Validation du contenu du message quand il y a une image
+
+        if (content !== '' && content.length < 2) {
+            return res.status(400).json({
+                message: "Le message doit contenir au moins deux caractères"
+            });
+        }
+
         postObj = {
-            ...JSON.parse(req.body.post),
+            // ...JSON.parse(req.body.post),
+            content: content,
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         };
 
         console.log("postObj", postObj);
         
     } else {
-        postObj = { ...req.body, imageUrl: null };
+        
+        const content = req.body.content.trim();
+
+        // Validation du contenu du message quand il n'y a pas d'image
+        
+        if (content.length < 2) {
+            return res.status(400).json({
+                message: "Le message doit contenir au moins deux caractères"
+            });
+        }
+
+        postObj = { content: content, imageUrl: null };
         console.log("postObj", postObj);
     }
   
@@ -64,7 +76,7 @@ exports.createPost = (req, res, next) => {
 exports.getAllPosts = (req, res, next) => {
     
     db.Post.findAll({
-        order: [['updatedAt', 'DESC'],],
+        order: [['createdAt', 'DESC'],],
         attributes: ['id', 'content', 'imageUrl', 'createdAt', 'updatedAt'],
         include: [
             {
@@ -243,13 +255,13 @@ exports.updatePost = (req, res, next) => {
     console.log("req file", req.file);
     console.log("req.body", req.body);
 
-    // Vérification de l'existence d'un fichier
+    // Validation du contenu du message
 
-    const content = req.file === undefined ? req.body.content : JSON.parse(req.body.post).content;
+    const content = req.file === undefined ? req.body.content.trim() : JSON.parse(req.body.post).content.trim();
 
-    if (content === '' || content === null) {
+    if ((req.file && (content !== '' && content.length < 2)) || (!req.file && content.length < 2)) {
         return res.status(400).json({
-            message: "Le contenu du message ne peut être vide"
+            message: "Le message doit contenir au moins deux caractères"
         });
     }
     
@@ -299,20 +311,25 @@ exports.updatePost = (req, res, next) => {
         if (req.file) {
 
             // Traitement de l'objet avec nouvelle image
+
+            const content = JSON.parse(req.body.post).content.trim();
             
             postObj = {
-                ...JSON.parse(req.body.post),
+                // ...JSON.parse(req.body.post),
+                content: content,
                 imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             };
 
         } else {
-
+            
             // Traitement de l'objet sans image uploadée
+            
+            const content = req.body.content.trim();
 
             const imageUrl = deleteImg ? null : post.imageUrl;
 
             postObj = { 
-                content: req.body.content,
+                content: content,
                 imageUrl: imageUrl
             };
 

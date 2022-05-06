@@ -3,7 +3,7 @@
     <div class="container mt-5">
       <h1 class="mb-4">Modification du profil</h1>
 
-      <form @submit.prevent="handleSubmit" id="myForm" enctype="multipart/form-data">
+      <form @submit.prevent="handleSubmit" id="myForm" enctype="multipart/form-data" class="mb-5">
         <div class="mb-3">
           <label for="usernameInput" class="form-label">Pseudo</label>
           <input v-model="username" @click="resetErrorMessage" type="text" class="form-control" id="usernameInput" required />
@@ -46,6 +46,7 @@ export default {
       valid: true,
       errorMessage: '',
       previewAvatar: this.$store.state.user.avatar,
+      previousAvatar: this.$store.state.user.avatar,
       isBioTooLong: false
     };
   },
@@ -107,6 +108,12 @@ export default {
     },
     onFileSelected(e) {
       const file = e.target.files[0];
+      console.log(file)
+      if (!file) {
+        this.previewAvatar = this.previousAvatar;
+        this.selectedFile = null;
+        return
+      }
       const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
       const MAX_SIZE = 1048576;
       const tooLarge = file.size > MAX_SIZE;

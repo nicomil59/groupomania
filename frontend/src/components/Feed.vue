@@ -1,26 +1,20 @@
 <template>
-    <div>
-        <h2>Fil d'actualité</h2>
+    <section id="feed" class="mt-5">
+        <!-- <h2 class="feed-title mb-5">Les derniers messages</h2> -->
+        <!-- <p>{{ isUpdated }}</p> -->
         <div class="feed-posts mx-auto">
             <ul class="mx-auto">
-                <!-- <li v-for="(post, index) in posts" :key="index" class="mb-5">
-                    <p><strong>{{ post.User.username }}</strong> : {{ post.content }}</p>
-                    <pre>{{ formatTime(post.createdAt) }}</pre>
-                </li> -->
-                <li v-for="(post, index) in posts" :key="index" class="mb-5">
+                <li v-for="(post) in posts" :key="post.id" class="mb-5">
                     <PostItem v-bind:post="post" />
                 </li>
             </ul>
         </div>
-    </div>
+    </section>
 </template>
 
 <script>
 import PostItem from "@/components/PostItem.vue";
 import Api from '../services/Api';
-import moment from 'moment';
-// console.log(moment().format());
-
 
 export default {
   name: 'FeedCompo',
@@ -32,28 +26,28 @@ export default {
       posts: [],
     };
   },
-  methods: {
-    formatTime(time) {
-        return moment(time).fromNow();
-    }
-  },
   async beforeMount() {
     const token = localStorage.getItem("token");
 
     try {
-
         const response = await Api.get('posts', {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
         });
 
         console.log("response appel API getAllPosts", response);
         this.posts = response.data;
+
+        this.$store.dispatch('setPosts', response.data);
         
     } catch (error) {
+        console.log('ooups')
         console.log(error);    
     }
+  },
+  updated() {
+    console.log('Feed mis à jour !')
   }
 }
 
@@ -61,8 +55,14 @@ export default {
 
 <style scoped>
     ul {
-        list-style-type: none;
-        padding-left: 0;
+      list-style-type: none;
+      padding-left: 0;
     }
 
+    .feed-title {
+      font-size: 1.5rem;
+      display: inline-block;
+      border-bottom: 3px solid #FD5835;
+    }
+    
 </style>
