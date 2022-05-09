@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
 
 // Création de l'application Express
 
@@ -28,5 +29,6 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/posts', commentRoutes);
 
 module.exports = app;

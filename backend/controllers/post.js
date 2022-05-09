@@ -56,18 +56,18 @@ exports.createPost = (req, res, next) => {
         content: postObj.content,
         // link: postObj.link,
         imageUrl: postObj.imageUrl
-     })
-     .then(() => res.status(201).json({
-         message: 'Post créé avec succès !'
-     }))
-     .catch(error => {
-        
+    })
+    .then(() => res.status(201).json({
+        message: 'Post créé avec succès !'
+    }))
+    .catch(error => {
+    
         console.log(error)
 
-         res.status(400).json({
+        res.status(400).json({
             message: error.message
-     }
-     )});
+        })
+    });
   };
 
 // ********** Récupération de tous les POSTS **********
@@ -114,6 +114,16 @@ exports.getOnePost = (req, res, next) => {
             {
                 model: db.User,
                 attributes: ['id', 'username', 'avatar']
+            },
+            {
+                model: db.Comment,
+                attributes: ['id', 'content'],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: ['id', 'username', 'avatar']
+                    }
+                ]
             }
         ]
     })
