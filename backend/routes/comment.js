@@ -11,8 +11,8 @@ const router = express.Router();
 // Création des routes
 
 router.post('/:id/comment', auth, commentCtrl.createComment);
-// router.put('/:id/comment/:id', auth, commentCtrl.updateComment);
-// router.delete('/:id/comment/:id', auth, commentCtrl.deleteComment);
+router.put('/:id/comment/:commentId', auth, commentCtrl.updateComment);
+router.delete('/:id/comment/:commentId', auth, commentCtrl.deleteComment);
 
 // Exports
 
