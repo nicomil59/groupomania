@@ -65,6 +65,29 @@
             <a href="#" class="card-link"><i class="far fa-heart"></i> J'aime</a>
             <a href="#" class="card-link"><i class="far fa-comment"></i> Commenter</a>
         </div>
+
+        <!-- Affichage des commentaires -->
+        
+        <div v-if="comments.length > 0 && comments.length <= 2" class="post-comments">
+            <ul>
+                <li v-for="comment in comments" :key="comment.id" class="mb-2">
+                    <CommentItem v-bind:comment="comment" />
+                </li>
+            </ul>
+        </div>
+        <div v-else-if="comments.length > 2" class="post-comments">
+            <ul>
+                <li v-for="comment in comments.slice(0,2)" :key="comment.id" class="mb-2">
+                    <CommentItem v-bind:comment="comment" />
+                </li>
+            </ul>
+            <button class="btn btn-white btn-showmore mx-2" @click="showMoreComments" ref="showMoreBtn">Voir plus de commentaires</button>
+            <ul v-if="showMore">
+                <li v-for="comment in comments.slice(2)" :key="comment.id" class="mb-2">
+                    <CommentItem v-bind:comment="comment" />
+                </li>
+            </ul>
+        </div>
     </div>
 
 </template>
@@ -75,11 +98,15 @@
     import { mapGetters } from "vuex";
     import Api from '../services/Api';
     import getClickableLink from '../utils/getClickableLink';
+    import CommentItem from "@/components/CommentItem.vue";
 
     export default {
         name: 'PostItem',
         props: {
             post: Object
+        },
+        components: {
+            CommentItem
         },
         data() {
             return {
@@ -91,7 +118,9 @@
                 validEdit: true,
                 errorMessageEdit: '',
                 toModify: false,
-                deleteImg: false
+                deleteImg: false,
+                comments: this.$props.post.Comments,
+                showMore: false
             };
         },
         computed: {
@@ -249,8 +278,11 @@
             },
             resetErrorMessage() {
                 this.validEdit = true;
-            }
-             
+            },
+            showMoreComments() {
+                this.showMore = true;
+                this.$refs.showMoreBtn.style.display = 'none';
+            } 
         },
         beforeMount() {
             // console.log('beforeMount Post Item');
@@ -262,11 +294,18 @@
             if(this.previewImageEdit) {
                 this.previousImage = this.previewImageEdit;
             }
+
+            console.log('commentaires', this.$props.post.Comments)
         }
     }
 </script>
 
 <style scoped>
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
     .post-card {
         border-radius: 15px;
         box-shadow: 0 2px 4px rgb(0 0 0 / 15%);
@@ -346,6 +385,10 @@
 
     .btn-remove:hover {
         background-color: #d6d6d6;
+    }
+
+    .btn-showmore {
+        color: #2c3e50;
     }
     
 </style>

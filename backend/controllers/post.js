@@ -85,7 +85,7 @@ exports.getAllPosts = (req, res, next) => {
             },
             {
                 model: db.Comment,
-                attributes: ['id', 'content'],
+                attributes: ['id', 'content', 'createdAt'],
                 include: [
                     {
                         model: db.User,
