@@ -2,8 +2,8 @@
   <div class="container-compo mx-auto">
     <div v-if="user" class="wall mx-auto">
       <h1 class="wall-title my-4">Le fil d'actualité</h1>
-      <NewPost />
-      <Feed />
+      <NewPost @newpost="setReload" />
+      <Feed :key="compoKey"/>
     </div>
     <div v-else class="welcome mx-auto">
       <img src="../assets/icon-above-font.png" alt="logo Groupomania" class="logo mx-auto d-block">
@@ -29,6 +29,11 @@ export default {
     NewPost,
     Feed
   },
+  data() {
+    return {
+      compoKey: 0
+    };
+  },
   computed: {
     ...mapGetters(['user'])
   },
@@ -37,6 +42,11 @@ export default {
   },
   updated() {
     console.log('HomeView mis à jour !')
+  },
+  methods: {
+    setReload() {
+      this.compoKey += 1;
+    }
   }
 }
 </script>

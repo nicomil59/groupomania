@@ -21,8 +21,7 @@
 
                     <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton1">
                         <li><a v-if="user.id === post.User.id" class="dropdown-item" href="javascript:void(0)" @click="editPost(post.id)">Modifier</a></li>
-                        <li><a v-if="user.id === post.User.id || user.isAdmin" class="dropdown-item"
-                                href="javascript:void(0)" @click="deletePost(post.id)">Supprimer</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" @click="deletePost(post.id)">Supprimer</a></li>
                     </ul>
                     
                 </div>
@@ -34,7 +33,7 @@
             <p class="card-text" ref="mycardtext">
                 
             </p>
-            <img v-if="post.imageUrl" :src="post.imageUrl" alt="image" class="post-image mb-3">
+            <img loading="lazy" v-if="post.imageUrl" :src="post.imageUrl" alt="image" class="post-image mb-3">
             <!-- <p v-if="isUpdated" class="post-firstpublished mb-0 mt-3 text-end">Première publication le {{ formatTimeUpdated(post.createdAt) }}</p> -->
         </div>
 
@@ -63,31 +62,34 @@
         </div>
         <div class="card-footer d-flex bg-white p-3">
             <a href="#" class="card-link"><i class="far fa-heart"></i> J'aime</a>
-            <a href="#" class="card-link"><i class="far fa-comment"></i> Commenter</a>
+            <!-- <a href="#" class="card-link"><i class="far fa-comment"></i> Commenter</a> -->
         </div>
 
         <!-- Affichage des commentaires -->
-        
         <div v-if="comments.length > 0 && comments.length <= 2" class="post-comments">
             <ul>
                 <li v-for="comment in comments" :key="comment.id" class="mb-2">
-                    <CommentItem v-bind:comment="comment" />
+                    <CommentItem v-bind:comment="comment" v-bind:postId="post.id" />
                 </li>
             </ul>
         </div>
         <div v-else-if="comments.length > 2" class="post-comments">
             <ul>
                 <li v-for="comment in comments.slice(0,2)" :key="comment.id" class="mb-2">
-                    <CommentItem v-bind:comment="comment" />
+                    <CommentItem v-bind:comment="comment" v-bind:postId="post.id" />
                 </li>
             </ul>
             <button class="btn btn-white btn-showmore mx-2" @click="showMoreComments" ref="showMoreBtn">Voir plus de commentaires</button>
             <ul v-if="showMore">
                 <li v-for="comment in comments.slice(2)" :key="comment.id" class="mb-2">
-                    <CommentItem v-bind:comment="comment" />
+                    <CommentItem v-bind:comment="comment" v-bind:postId="post.id" />
                 </li>
             </ul>
         </div>
+
+        <!-- Rédaction d'un nouveau commentaire -->
+
+        <NewComment v-bind:postId="post.id" />
     </div>
 
 </template>
@@ -99,6 +101,7 @@
     import Api from '../services/Api';
     import getClickableLink from '../utils/getClickableLink';
     import CommentItem from "@/components/CommentItem.vue";
+    import NewComment from "@/components/NewComment.vue";
 
     export default {
         name: 'PostItem',
@@ -106,7 +109,8 @@
             post: Object
         },
         components: {
-            CommentItem
+            CommentItem,
+            NewComment
         },
         data() {
             return {
@@ -120,7 +124,9 @@
                 toModify: false,
                 deleteImg: false,
                 comments: this.$props.post.Comments,
-                showMore: false
+                showMore: false,
+                // isUpdated: false,
+                // onePost: this.$props.post,
             };
         },
         computed: {
@@ -169,7 +175,8 @@
                     console.log(response.data);
 
                     alert('Post supprimé !');
-                    this.$router.go();
+                    this.$emit('postdeleted');
+                    // this.$router.go();
 
                 } catch (error) {
                     console.log(error.response.data);
@@ -282,7 +289,32 @@
             showMoreComments() {
                 this.showMore = true;
                 this.$refs.showMoreBtn.style.display = 'none';
-            } 
+            },
+            // callFeed() {
+            //     console.log('call feed !')
+            //     this.$emit('reloadfeed');
+            // }
+            // setReload(postId) {
+            //     console.log('set Reload')
+            //     this.getPost(postId);
+            // },
+            // async getPost(postId) {
+            //     const token = localStorage.getItem("token");
+
+            //     try {
+            //         const response = await Api.get(`posts/${postId}`, {
+            //             headers: {
+            //                 Authorization: `Bearer ${token}`,
+            //             },
+            //         });
+
+            //         console.log("response appel API getOnePost", response);
+            //         this.onePost = response.data;
+                    
+            //     } catch (error) {
+            //         console.log(error);    
+            //     }
+            // } 
         },
         beforeMount() {
             // console.log('beforeMount Post Item');
@@ -295,7 +327,10 @@
                 this.previousImage = this.previewImageEdit;
             }
 
-            console.log('commentaires', this.$props.post.Comments)
+            // console.log('commentaires', this.$props.post.Comments)
+        },
+        updated() {
+            console.log("PostItem mis à jour")
         }
     }
 </script>

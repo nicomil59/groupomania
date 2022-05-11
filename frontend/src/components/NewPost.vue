@@ -78,7 +78,8 @@ import Api from '../services/Api';
           this.selectedFile = null;
           this.previewImage = '';
 
-          this.$router.go();
+          // this.$router.go();
+          this.$emit('newpost');
           // window.location.reload();
 
         } catch (error) {

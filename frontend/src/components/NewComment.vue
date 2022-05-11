@@ -1,0 +1,116 @@
+<template>
+    <div class="card newcomment-card border-0" id="newcomment">
+        <form class="bg-white p-3" @submit.prevent="handleSubmit" id="commentForm" enctype="multipart/form-data">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="me-2">
+                    <img class="rounded-circle avatar" :src="user.avatar" alt="avatar">
+                </div>
+                <div class="me-auto w-100">
+                    <textarea @click="resetErrorMessage" v-model="message" type="text" class="form-control"
+                        id="newCommentInput" placeholder="Écrivez un commentaire..." rows="3" />
+                    </div>
+            </div>
+        
+            <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
+
+            <div class="d-flex justify-content-end mb-2 card-btns">
+                <button type="submit" class="btn btn-groupo">Répondre</button>
+            </div>
+
+        </form>
+    </div>
+
+</template>
+
+<script>
+    import { mapGetters } from "vuex";
+    import Api from '../services/Api';
+
+    export default {
+        name: 'NewComment',
+        props: {
+            postId: Number
+        },
+        data() {
+            return {
+                // toModify: false,
+                valid: true,
+                errorMessage: '',
+                message: ''
+            };
+        },
+        computed: {
+            ...mapGetters(["user"])
+        },
+        methods: {
+            async handleSubmit() {
+                console.log(this.message)
+
+                const body = { content: this.message };
+                const postId = this.$props.postId;
+                const token = localStorage.getItem("token");
+
+                try {
+                    const response = await Api.post(`posts/${postId}/comment`, body, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    console.log("response data", response.data);
+
+                    this.message = '';
+                    // this.$emit('newcomment');
+                    this.$router.go();
+
+                } catch (error) {
+                    console.log(error.response.data);
+                    this.valid = false;
+                    this.errorMessage = error.response.data.message;
+                }
+
+
+            },
+            resetErrorMessage() {
+                this.valid = true;
+            }
+        },
+        beforeMount() {
+            // console.log('beforeMount Post Item');
+            // console.log(this.$store.state.user.isAdmin)
+        },
+        mounted() {
+            // console.log(this.$refs.mycardtext);
+        }
+    }
+</script>
+
+<style scoped>
+    textarea {
+        resize: none;
+        background: #fcfbfb;
+    }
+
+    .newcomment-card {
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        border-top: 0;
+    }
+
+    .newcomment-card form {
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+    
+    .avatar {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+    }
+
+    .validFeedback {
+        color: red;
+    }
+</style>

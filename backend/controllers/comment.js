@@ -9,7 +9,7 @@ exports.createComment = (req, res, next) => {
     console.log('req body', req.body);
     console.log('req.params.id', req.params.id);
 
-    if (req.body.content.length < 2) {
+    if (req.body.content.trim().length < 2) {
         return res.status(400).json({
             message: "Le message doit contenir au moins deux caractères"
         });

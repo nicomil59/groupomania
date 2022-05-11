@@ -241,6 +241,7 @@ exports.deletePost = (req, res, next) => {
                     message: `Post supprimé !`
                 }))
                 .catch(error => res.status(400).json({
+                    error,
                     message: error.message
                 }));
 
