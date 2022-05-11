@@ -3,6 +3,7 @@ const path = require('path');
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
+const likeRoutes = require('./routes/like');
 
 // Création de l'application Express
 
@@ -30,5 +31,6 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/posts', commentRoutes);
+app.use('/api/posts', likeRoutes);
 
 module.exports = app;
