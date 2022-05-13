@@ -15,7 +15,7 @@
           <!-- <router-link :to="`/modify-profile/${userId}`" class="btn btn-primary  btn-modify" v-if="!loggedIn">Modifier profil</router-link> -->
           <router-link :to="`/modify-password/${user.id}`" class="btn btn-primary btn-password" v-if="loggedIn">Modifier mot de passe</router-link>
           <!-- <router-link :to="`/modify-password/${userId}`" class="btn btn-primary btn-password" v-if="!loggedIn">Modifier mot de passe</router-link> -->
-          <a href="javascript:void(0)" @click="deleteUser" class="btn btn-groupo">Supprimer compte</a>
+          <button @click="deleteUser" class="btn btn-groupo">Supprimer compte</button>
         </div>
       </div>
     </div>

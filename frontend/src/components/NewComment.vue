@@ -8,7 +8,7 @@
                 </div>
                 <div class="me-auto w-100">
                     <textarea @click="resetErrorMessage" v-model="message" type="text" class="form-control"
-                        id="newCommentInput" placeholder="Écrivez un commentaire..." rows="3" />
+                        v-bind:id="'newCommentInput' + postId" placeholder="Écrivez un commentaire..." rows="3" />
                     </div>
             </div>
         

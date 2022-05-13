@@ -14,14 +14,14 @@
                 </div>
 
                 <div v-if="user.id === comment.User.id || user.isAdmin" class="dropdown">
-                    <a class="btn btn-white" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                    <a class="btn btn-white" type="button" v-bind:id="'dropdownMenuButton' + comment.id" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <i class="fas fa-ellipsis-h ellipsis-icon"></i>
                     </a>
 
-                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton1">
-                        <li><a v-if="user.id === comment.User.id" class="dropdown-item" href="javascript:void(0)" @click="editComment(comment.id)">Modifier</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" @click="deleteComment(comment.id)">Supprimer</a></li>
+                    <ul class="dropdown-menu dropdown-menu-right" v-bind:aria-labelledby="'dropdownMenuButton' + comment.id">
+                        <li><button v-if="user.id === comment.User.id" class="dropdown-item" @click="editComment(comment.id)">Modifier</button></li>
+                        <li><button class="dropdown-item" @click="deleteComment(comment.id)">Supprimer</button></li>
                     </ul>
                     
                 </div>
@@ -38,11 +38,11 @@
             <h3 class="text-center mb-3">Éditer le commentaire</h3>
             <form @submit.prevent="handleSubmit" id="commentEditForm" enctype="multipart/form-data" class="mb-5">
                 <div class="mb-3">
-                    <label for="commentInput" class="form-label">Commentaire</label>
-                    <textarea @click="resetErrorMessage" v-model="messageEdit" type="text" class="form-control" id="commentInput" rows="3" />
+                    <label v-bind:for="'commentInput' + comment.id" class="form-label">Commentaire</label>
+                    <textarea @click="resetErrorMessage" v-model="messageEdit" type="text" class="form-control" v-bind:id="'commentInput' + comment.id" rows="3" />
                 </div>
                 <p v-if="!validEdit" class="validFeedback">{{ errorMessageEdit }}</p>
-                <a @click="abort" class="btn btn-white btn-space btn-abort">Annuler</a>
+                <button @click.prevent="abort" class="btn btn-white btn-space btn-abort">Annuler</button>
                 <button :disabled="!validEdit" type="submit" class="btn btn-groupo">Sauvegarder</button>
             </form>
         </div>
@@ -228,6 +228,7 @@
     .btn-abort {
         background-color: #FFF;
     }
+
     .btn-abort:hover {
         background-color: #d6d6d6;
     }

@@ -37,7 +37,7 @@
             </router-link>
           </li>
           <li class="nav-item nav-item-logout">
-            <a href="javascript:void(0)" @click="logOut" class="nav-link logout-link">Se déconnecter</a>
+            <button @click="logOut" class="nav-link logout-link btn btn-groupo">Se déconnecter</button>
           </li>
         </ul>
       </div>
@@ -82,6 +82,7 @@ export default {
 
   .navbar .logo {
     height: 50px;
+    width: 100%;
   }
 
   .navbar-nav {

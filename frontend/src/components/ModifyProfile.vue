@@ -23,7 +23,7 @@
             <input class="form-control" type="file" id="avatarInput" ref="fileInput" @change="onFileSelected"  @click="resetErrorMessage">
         </div>
         <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
-        <a @click="abort" class="btn btn-light btn-space">Retour</a>
+        <button @click.prevent="abort" class="btn btn-light btn-space btn-abort">Retour</button>
         <button :disabled="!valid" type="submit" class="btn btn-primary btn-space btn-groupo">Sauvegarder</button>
       </form>
     </div>
@@ -182,6 +182,10 @@ export default {
 
   .btn-space {
     margin-right: 10px;
+  }
+
+  .btn-abort:hover {
+    background-color: #d6d6d6;
   }
 
   .imagePreviewWrapper {

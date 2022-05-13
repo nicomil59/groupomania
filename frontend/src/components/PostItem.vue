@@ -14,14 +14,14 @@
                 </div>
 
                 <div v-if="user.id === post.User.id || user.isAdmin" class="dropdown">
-                    <a class="btn btn-white" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                    <a class="btn btn-white" type="button" v-bind:id="'dropdownMenuButton' + post.id" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <i class="fas fa-ellipsis-h ellipsis-icon"></i>
                     </a>
 
-                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton1">
-                        <li><a v-if="user.id === post.User.id" class="dropdown-item" href="javascript:void(0)" @click="editPost(post.id)">Modifier</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" @click="deletePost(post.id)">Supprimer</a></li>
+                    <ul class="dropdown-menu dropdown-menu-right" v-bind:aria-labelledby="'dropdownMenuButton' + post.id">
+                        <li><button v-if="user.id === post.User.id" class="dropdown-item" @click="editPost(post.id)">Modifier</button></li>
+                        <li><button class="dropdown-item" @click="deletePost(post.id)">Supprimer</button></li>
                     </ul>
                     
                 </div>
@@ -55,7 +55,7 @@
                 </div>
                 
                 <p v-if="!validEdit" class="validFeedback">{{ errorMessageEdit }}</p>
-                <a @click="abort" class="btn btn-light btn-space">Annuler</a>
+                <button @click.prevent="abort" class="btn btn-light btn-space btn-abort">Annuler</button>
                 <button :disabled="!validEdit" type="submit" class="btn btn-groupo">Sauvegarder</button>
             </form>
             
@@ -382,6 +382,8 @@
 
     .post-image {
         max-width: 100%;
+        width: 100%;
+        height: 100%;
     }
 
     .post-time {
@@ -432,6 +434,10 @@
 
     .btn-showmore {
         color: #2c3e50;
+    }
+
+    .btn-abort:hover {
+        background-color: #d6d6d6;
     }
     
 </style>

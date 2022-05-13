@@ -23,7 +23,7 @@
                 <p v-if="!isConfirmPasswordOK" class="validFeedback">Les mots de passe sont différents !</p>
                 <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
 
-                <a @click="abort" class="btn btn-light btn-space">Retour</a>
+                <button @click.prevent="abort" class="btn btn-light btn-space btn-abort">Retour</button>
                 <button :disabled="isSamePassword || !isConfirmPasswordOK" type="submit"
                     class="btn btn-primary btn-space btn-groupo">Valider</button>
             </form>
@@ -125,6 +125,10 @@
 
     .btn-space {
         margin-right: 10px;
+    }
+
+    .btn-abort:hover {
+        background-color: #d6d6d6;
     }
 
     .validFeedback {
