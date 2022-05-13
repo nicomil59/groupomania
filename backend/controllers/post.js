@@ -92,6 +92,16 @@ exports.getAllPosts = (req, res, next) => {
                         attributes: ['id', 'username', 'avatar']
                     }
                 ]
+            },
+            {
+                model: db.Like,
+                attributes: ['id', 'createdAt'],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: ['id', 'username']
+                    }
+                ]
             }
         ]
     })
@@ -132,6 +142,16 @@ exports.getOnePost = (req, res, next) => {
                     {
                         model: db.User,
                         attributes: ['id', 'username', 'avatar']
+                    }
+                ]
+            },
+            {
+                model: db.Like,
+                attributes: ['id', 'createdAt'],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: ['id', 'username']
                     }
                 ]
             }

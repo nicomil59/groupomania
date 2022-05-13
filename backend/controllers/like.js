@@ -5,6 +5,7 @@ const db = require('../models');
 
 exports.like = (req, res, next) => {
 
+    console.log('req body', req.body === null);
     console.log('req auth -- userId', req.auth.userId);
     console.log('req.params.id -- postId', req.params.id);
 

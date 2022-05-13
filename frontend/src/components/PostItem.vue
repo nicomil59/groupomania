@@ -60,10 +60,10 @@
             </form>
             
         </div>
-        <div class="card-footer d-flex bg-white p-3">
+        <!-- <div class="card-footer d-flex bg-white p-3">
             <a href="#" class="card-link"><i class="far fa-heart"></i> J'aime</a>
-            <!-- <a href="#" class="card-link"><i class="far fa-comment"></i> Commenter</a> -->
-        </div>
+        </div> -->
+        <LikeItem v-bind:postId="post.id" v-bind:likes="likes" />
 
         <!-- Affichage des commentaires -->
         <div v-if="comments.length > 0 && comments.length <= 2" class="post-comments">
@@ -102,6 +102,7 @@
     import getClickableLink from '../utils/getClickableLink';
     import CommentItem from "@/components/CommentItem.vue";
     import NewComment from "@/components/NewComment.vue";
+    import LikeItem from "@/components/LikeItem.vue";
 
     export default {
         name: 'PostItem',
@@ -110,7 +111,8 @@
         },
         components: {
             CommentItem,
-            NewComment
+            NewComment,
+            LikeItem
         },
         data() {
             return {
@@ -127,6 +129,7 @@
                 showMore: false,
                 // isUpdated: false,
                 // onePost: this.$props.post,
+                likes: this.$props.post.Likes
             };
         },
         computed: {
@@ -328,6 +331,7 @@
             }
 
             // console.log('commentaires', this.$props.post.Comments)
+            // console.log('likes', this.$props.post.Likes);
         },
         updated() {
             console.log("PostItem mis à jour")
