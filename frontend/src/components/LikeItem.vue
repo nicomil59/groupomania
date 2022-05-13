@@ -43,12 +43,8 @@
                 this.displayLike();
 
                 // Logique du like
-                const userId = this.$store.state.user.id;
                 const postId = this.$props.postId;
                 const token = localStorage.getItem("token");
-                console.log("token", token);
-                console.log('userId', userId);
-                console.log('postId', postId);
 
                 try {
                     const response = await Api.post(`posts/${postId}/like`, null, {
@@ -81,9 +77,6 @@
                     this.countLikes--;
                 }
             }
-        },
-        mounted() {
-            // console.log('likes', this.$props.likes);
         }
     }
 </script>

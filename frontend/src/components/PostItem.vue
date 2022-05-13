@@ -33,7 +33,7 @@
             <p class="card-text" ref="mycardtext">
                 
             </p>
-            <img loading="lazy" v-if="post.imageUrl" :src="post.imageUrl" alt="image" class="post-image mb-3">
+            <img loading="lazy" v-if="post.imageUrl" :src="post.imageUrl" alt="image" class="post-image">
             <!-- <p v-if="isUpdated" class="post-firstpublished mb-0 mt-3 text-end">Première publication le {{ formatTimeUpdated(post.createdAt) }}</p> -->
         </div>
 
