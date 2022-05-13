@@ -170,7 +170,7 @@
         },
         beforeMount() {
             // console.log('beforeMount Post Item');
-            
+            // console.log("texte du commentaire: ", this.$props.comment.content);
         },
         mounted() {
         }
@@ -209,6 +209,7 @@
 
     .card-text {
         font-size: 0.9rem;
+        white-space: pre-wrap;
     }
 
     .comment-time {

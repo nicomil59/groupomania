@@ -376,6 +376,10 @@
         color: #65676B;
     }
 
+    .card-text {
+        white-space: pre-wrap;
+    }
+
     .post-image {
         max-width: 100%;
     }
