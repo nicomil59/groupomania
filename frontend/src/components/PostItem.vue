@@ -246,6 +246,7 @@
             abort() {
                 this.toModify = false;
                 // this.$refs.mycardtext.innerHTML = getClickableLink(this.$props.post.content);
+                this.messageEdit = this.$props.post.content;
                 this.previewImageEdit = this.previousImage;
                 this.selectedFileEdit = null;
                 this.deleteImg = false;

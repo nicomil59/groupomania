@@ -1,6 +1,6 @@
 <template>
   <div class="container-compo mx-auto">
-    <div class="container mt-5">
+    <div class="container mt-2">
       <h1 class="mb-4">Modification du profil</h1>
 
       <form @submit.prevent="handleSubmit" id="myForm" enctype="multipart/form-data" class="mb-5">
@@ -177,7 +177,7 @@ export default {
 
   .container-compo {
     max-width: 500px;
-    margin-top: 5%;
+    margin-top: 3%;
   }
 
   h1 {
@@ -212,7 +212,7 @@ export default {
     height: 100px;
     border-radius: 50%;
     display: block;
-    cursor: pointer;
+    /* cursor: pointer; */
     /* margin: 0 auto 30px; */
     background-size: cover;
     background-position: center center;

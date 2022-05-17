@@ -30,7 +30,8 @@
         </div>
 
         <div v-show="!toModify" class="card-body px-3 pt-1">
-            <p class="card-text">{{ comment.content }}</p>
+            <!-- <p class="card-text">{{ comment.content }}</p> -->
+            <p class="card-text" ref="commentContent"></p>
         </div>
 
         <!-- Affichage lors de l'édition du commentaire -->
@@ -59,6 +60,7 @@
     import moment from 'moment';
     moment.locale('fr');
     import Api from '../services/Api';
+    import getClickableLink from '../utils/getClickableLink';
 
     export default {
         name: 'CommentItem',
@@ -163,6 +165,7 @@
             },
             abort() {
                 this.toModify = false;
+                this.messageEdit = this.$props.comment.content;
             },
             resetErrorMessage() {
                 this.validEdit = true;
@@ -173,6 +176,7 @@
             // console.log("texte du commentaire: ", this.$props.comment.content);
         },
         mounted() {
+            this.$refs.commentContent.innerHTML = getClickableLink(this.$props.comment.content);
         }
     }
 </script>

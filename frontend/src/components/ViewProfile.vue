@@ -8,7 +8,7 @@
         <img :src="avatar" class="rounded-circle img-fluid avatar" alt="avatar"/>
         <h3 class="my-3">{{ username }}</h3>
         <p class="text-muted mb-3">{{ email }}</p>
-        <p class="mb-4 text-bio">{{ bio }}</p>
+        <p class="mb-4 text-bio" ref="bio"></p>
         <div class="d-flex justify-content-center mb-2 card-btns">
           <!-- <router-link :to="{name: 'modify-profile', params: { id: user.id }}" class="btn btn-primary">Modifier</router-link> -->
           <router-link :to="`/modify-profile/${user.id}`" class="btn btn-primary  btn-modify" v-if="loggedIn">Modifier profil</router-link>
@@ -26,6 +26,7 @@
 <script>
 import { mapGetters } from "vuex";
 import Api from '../services/Api';
+import getClickableLink from '../utils/getClickableLink';
 
 export default {
   name: "ViewProfile",
@@ -99,6 +100,7 @@ export default {
       this.username = response.data.username;
       this.email = response.data.email;
       this.bio = response.data.bio;
+      this.$refs.bio.innerHTML = getClickableLink(response.data.bio)
       this.avatar = response.data.avatar;
       this.userId = response.data.id;
 
