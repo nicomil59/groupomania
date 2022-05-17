@@ -25,7 +25,7 @@
         </div>
         <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
         <button @click.prevent="abort" class="btn btn-light btn-space btn-abort">Retour</button>
-        <button :disabled="!valid" type="submit" class="btn btn-primary btn-space btn-groupo">Sauvegarder</button>
+        <button :disabled="!valid" type="submit" class="btn btn-space btn-groupo">Sauvegarder</button>
       </form>
     </div>
   </div>

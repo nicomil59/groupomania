@@ -64,8 +64,20 @@ exports.signup = (req, res) => {
                     
                     const errorMessage = error.errors[0].message;
 
+                    console.log('errorMessage', errorMessage);
+
+                    let errorMessageToSend;
+
+                    if(errorMessage === 'username must be unique') {
+                        errorMessageToSend = 'pseudo déjà pris !';
+                    } else if (errorMessage === 'email must be unique') {
+                        errorMessageToSend = 'email déjà pris !';
+                    } else {
+                        errorMessageToSend = errorMessage;
+                    }
+
                     res.status(400).json({
-                        message: errorMessage
+                        message: errorMessageToSend
                 }
                 )});
 
@@ -451,8 +463,18 @@ exports.updateUser = (req, res, next) => {
                     
                 const errorMessage = error.errors[0].message;
 
+                console.log('errorMessage', errorMessage);
+
+                let errorMessageToSend;
+
+                if(errorMessage === 'username must be unique') {
+                    errorMessageToSend = 'pseudo déjà pris !';
+                } else {
+                    errorMessageToSend = errorMessage;
+                }
+
                 res.status(400).json({
-                    message: errorMessage,
+                    message: errorMessageToSend,
                     error: error
             }
             )});

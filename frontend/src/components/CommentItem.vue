@@ -166,6 +166,8 @@
             abort() {
                 this.toModify = false;
                 this.messageEdit = this.$props.comment.content;
+                this.errorMessageEdit = '';
+                this.validEdit = true;
             },
             resetErrorMessage() {
                 this.validEdit = true;

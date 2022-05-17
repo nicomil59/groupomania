@@ -126,6 +126,7 @@
                 errorMessageEdit: '',
                 toModify: false,
                 deleteImg: false,
+                keepPreviousImg: false,
                 comments: this.$props.post.Comments,
                 showMore: false,
                 // isUpdated: false,
@@ -200,9 +201,12 @@
                 console.log('message edited', this.messageEdit)
                 console.log('effacer image ?', this.deleteImg)
 
+                this.keepPreviousImg = this.previewImageEdit === this.previousImage;
+
                 const postInfos = {
                     content: this.messageEdit,
-                    deleteImg: this.deleteImg
+                    deleteImg: this.deleteImg,
+                    keepPreviousImg: this.keepPreviousImg
                 }
 
                 let body = postInfos;
@@ -233,6 +237,7 @@
                     // this.previewImageEdit = '';
                     this.selectedFileEdit = null;
                     this.deleteImg = false;
+                    this.keepPreviousImg = false;
                     this.toModify = false;
                     // window.location.reload();
                     this.$router.go();
@@ -250,6 +255,9 @@
                 this.previewImageEdit = this.previousImage;
                 this.selectedFileEdit = null;
                 this.deleteImg = false;
+                this.keepPreviousImg = false;
+                this.errorMessageEdit = '';
+                this.validEdit = true;
             },
             onFileSelected(e) {
                 const file = e.target.files[0];

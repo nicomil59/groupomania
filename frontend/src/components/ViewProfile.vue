@@ -100,7 +100,8 @@ export default {
       this.username = response.data.username;
       this.email = response.data.email;
       this.bio = response.data.bio;
-      this.$refs.bio.innerHTML = getClickableLink(response.data.bio)
+      console.log('response.data.bio', this.bio);
+      this.$refs.bio.innerHTML = this.bio !== null ? getClickableLink(response.data.bio) : '';
       this.avatar = response.data.avatar;
       this.userId = response.data.id;
 
@@ -111,9 +112,9 @@ export default {
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
     } catch (error) {
-      console.log(error);
-      alert("Accès non autorisé");
-      this.$router.push('/');
+        console.log(error);
+        alert("Accès non autorisé");
+        this.$router.push('/');
         
     }
   },

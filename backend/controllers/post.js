@@ -300,7 +300,7 @@ exports.updatePost = (req, res, next) => {
 
     const content = req.file === undefined ? req.body.content.trim() : JSON.parse(req.body.post).content.trim();
 
-    if ((req.file && (content !== '' && content.length < 2)) || (!req.file && content.length < 2)) {
+    if (((req.file || req.body.keepPreviousImg) && content.length === 1) || (!req.file && !req.body.keepPreviousImg && content.length < 2)) {
         return res.status(400).json({
             message: "Le message doit contenir au moins deux caractères"
         });
