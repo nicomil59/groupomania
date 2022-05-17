@@ -7,18 +7,18 @@
             <img class="rounded-circle avatar" :src="user.avatar" alt="avatar">
           </div>
           <div class="me-auto w-100">
-            <!-- <label for="newPostInput" class="form-label">Bio</label> -->
-            <textarea @click="resetErrorMessage" v-model="message" type="text" class="form-control" id="newPostInput" placeholder="quoi de neuf ?" rows="5" />
+            <textarea @click="resetErrorMessage" v-model="message" type="text" class="form-control" id="newPostInput" placeholder="Quoi de neuf ?" rows="5" />
             </div>
         </div>
         
         <img v-if="previewImage" class="image-preview mb-4" :src="previewImage" />
 
         <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
+        <!-- <p v-if="isEmptyContent" class="validFeedback">Un message seul doit contenir au moins deux caractères.</p> -->
 
         <div class="d-flex justify-content-end mb-2 card-btns">
           <label for="newPostImage" class="form-label image-label d-flex"><i class="fas fa-image image-icon"></i>Image</label>
-          <input v-if="!previewImage" type="file" id="newPostImage" class="form-control btn-upload" @change="onFileSelected" @click="resetErrorMessage">
+          <input v-if="!previewImage" type="file" id="newPostImage" ref="newPostImage" class="form-control btn-upload" @change="onFileSelected" @click="resetErrorMessage">
           <button v-else @click="removeImage" class="btn btn-remove">Retirer image</button>
           <button :disabled="!valid" type="submit" class="btn btn-groupo btn-publish">Publier</button>
         </div>
@@ -43,7 +43,10 @@ import Api from '../services/Api';
       };
     },
     computed: {
-      ...mapGetters(['user'])
+      ...mapGetters(['user']),
+      // isEmptyContent() {
+      //   return this.previewImage === '' && this.message.length < 2;
+      // }
     },
     methods: {
       async handleSubmit() {  
@@ -114,6 +117,7 @@ import Api from '../services/Api';
         } else {
             this.valid = false;
             this.errorMessage = tooLarge ? "Fichier trop volumineux : la taille ne doit pas dépasser 1 Mo" : "Seules les images sont autorisées";
+            this.$refs.newPostImage.value = '';
         }
       },      
       removeImage() {
@@ -122,7 +126,7 @@ import Api from '../services/Api';
       },
       resetErrorMessage() {
         this.valid = true;
-      }
+      },
     },
     beforeMount() {
       console.log('beforeMount newpost');

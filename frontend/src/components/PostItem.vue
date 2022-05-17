@@ -41,7 +41,7 @@
 
         <div v-if="toModify" class="card-body">
             <h3 class="text-center mb-3">Modifier la publication</h3>
-            <form @submit.prevent="handleSubmit" id="myForm" enctype="multipart/form-data" class="mb-5">
+            <form @submit.prevent="handleSubmit" id="myForm" enctype="multipart/form-data" class="mb-3">
                 <div class="mb-3">
                     <label for="messageInput" class="form-label">Message</label>
                     <textarea @click="resetErrorMessage" v-model="messageEdit" type="text" class="form-control" id="messageInput" rows="5" />
@@ -49,14 +49,15 @@
                 <div class="mb-3">
                     <label for="imageInput" class="form-label mb-3 d-block">Image</label>
                     <img v-if="previewImageEdit" class="image-preview d-block mb-3" :src="previewImageEdit" />
-                    <a v-if="previewImageEdit && !selectedFileEdit" @click="removeImage" class="btn btn-danger mb-3">Supprimer image</a>
-                    <input class="form-control btn-upload mb-3" type="file" id="imageInput" @change="onFileSelected" @click="resetErrorMessage">
+                    <button v-if="previewImageEdit" @click.prevent="removeImage" class="btn btn-danger mb-3">Retirer image</button>
+                    <input v-if="!previewImageEdit" class="form-control btn-upload mb-3" type="file" id="imageInput" ref="imageInput" @change="onFileSelected" @click="resetErrorMessage">
                     <!-- <a v-if="!selectedFileEdit" @click="removeImage" class="btn btn-danger mb-3">Supprimer image</a> -->
                 </div>
                 
                 <p v-if="!validEdit" class="validFeedback">{{ errorMessageEdit }}</p>
+                <p v-if="isEmptyContent" class="validFeedback">Un message seul doit contenir au moins deux caractères.</p>
                 <button @click.prevent="abort" class="btn btn-light btn-space btn-abort">Annuler</button>
-                <button :disabled="!validEdit" type="submit" class="btn btn-groupo">Sauvegarder</button>
+                <button :disabled="!validEdit || isEmptyContent" type="submit" class="btn btn-groupo">Sauvegarder</button>
             </form>
             
         </div>
@@ -89,7 +90,7 @@
 
         <!-- Rédaction d'un nouveau commentaire -->
 
-        <NewComment v-bind:postId="post.id" />
+        <NewComment v-if="!toModify" v-bind:postId="post.id" />
     </div>
 
 </template>
@@ -137,6 +138,9 @@
             // isUpdated() {
             //     return this.$props.post.createdAt !== this.$props.post.updatedAt;
             // }
+            isEmptyContent() {
+              return this.previewImageEdit === '' && this.messageEdit.length < 2;
+            }
         },
         methods: {
             formatTime(time) {
@@ -226,10 +230,11 @@
                     alert('Les modifications ont bien été enregistrées !');
 
                     // this.messageEdit = '';
-                    // this.selectedFileEdit = null;
                     // this.previewImageEdit = '';
-                    // this.deleteImg = false;
+                    this.selectedFileEdit = null;
+                    this.deleteImg = false;
                     this.toModify = false;
+                    // window.location.reload();
                     this.$router.go();
 
                 } catch (error) {
@@ -280,10 +285,12 @@
                 } else {
                     this.validEdit = false;
                     this.errorMessageEdit = tooLarge ? "Fichier trop volumineux : la taille ne doit pas dépasser 1 Mo" : "Seules les images sont autorisées";
+                    this.$refs.imageInput.value = '';
                 }
             },
             removeImage() {
                 this.previewImageEdit = '';
+                this.selectedFileEdit = null;
                 this.deleteImg = true;
             },
             resetErrorMessage() {

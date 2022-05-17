@@ -19,8 +19,9 @@
         <p v-if="isBioTooLong" class="validFeedback">La bio ne doit pas dépasser les 255 caractères autorisés</p>
         <div class="mb-4">
             <label for="avatarInput" class="form-label">Avatar</label>
-            <div class="imagePreviewWrapper mb-3" :style="{'background-image': `url(${previewAvatar})`}" @click="selectImage"></div>
-            <input class="form-control" type="file" id="avatarInput" ref="fileInput" @change="onFileSelected"  @click="resetErrorMessage">
+            <div class="imagePreviewWrapper mb-3" :style="{'background-image': `url(${previewAvatar})`}" ></div>
+            <input v-if="!isNewAvatar" class="form-control" type="file" id="avatarInput" ref="fileInput" @change="onFileSelected"  @click="resetErrorMessage">
+            <button v-else @click.prevent="removeImage" class="btn btn-cancel mb-3">Annuler changement avatar</button>
         </div>
         <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
         <button @click.prevent="abort" class="btn btn-light btn-space btn-abort">Retour</button>
@@ -47,7 +48,8 @@ export default {
       errorMessage: '',
       previewAvatar: this.$store.state.user.avatar,
       previousAvatar: this.$store.state.user.avatar,
-      isBioTooLong: false
+      isBioTooLong: false,
+      isNewAvatar : false
     };
   },
   computed: {
@@ -103,9 +105,9 @@ export default {
           
       }
     },
-    selectImage() {
-      this.$refs.fileInput.click()
-    },
+    // selectImage() {
+    //   this.$refs.fileInput.click()
+    // },
     onFileSelected(e) {
       const file = e.target.files[0];
       console.log(file)
@@ -120,6 +122,7 @@ export default {
 
       if(allowedTypes.includes(file.type) && !tooLarge) {
         this.selectedFile = e.target.files[0];
+        this.isNewAvatar = true;
 
         // preview uploaded image
         let reader = new FileReader;
@@ -132,6 +135,7 @@ export default {
       } else {
         this.valid = false;
         this.errorMessage = tooLarge ? "Fichier trop volumineux : la taille ne doit pas dépasser 1 Mo" : "Seules les images sont autorisées";
+        this.$refs.fileInput.value = '';
       }
     },
     abort() {
@@ -150,7 +154,12 @@ export default {
       }  else {
         this.isBioTooLong = false;
       }
-    }
+    },
+    removeImage() {
+        this.previewAvatar = this.previousAvatar;
+        this.selectedFile = null;
+        this.isNewAvatar = false;
+    },
   },
   mounted() {
     // console.log(this.$store.state.user);
@@ -162,9 +171,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .btn {
+  /* .btn {
     font-weight: bold !important;
-  }
+  } */
 
   .container-compo {
     max-width: 500px;
@@ -178,6 +187,16 @@ export default {
 
   textarea {
     resize: none;
+  }
+
+  .btn-cancel {
+    background-color: #EFEFEF;
+    border-color: #EFEFEF;
+    color: #111 !important;
+  }
+
+  .btn-cancel:hover {
+    background-color: #d6d6d6;
   }
 
   .btn-space {

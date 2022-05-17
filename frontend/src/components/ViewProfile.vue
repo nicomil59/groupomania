@@ -8,7 +8,7 @@
         <img :src="avatar" class="rounded-circle img-fluid avatar" alt="avatar"/>
         <h3 class="my-3">{{ username }}</h3>
         <p class="text-muted mb-3">{{ email }}</p>
-        <p class="mb-4">{{ bio }}</p>
+        <p class="mb-4 text-bio">{{ bio }}</p>
         <div class="d-flex justify-content-center mb-2 card-btns">
           <!-- <router-link :to="{name: 'modify-profile', params: { id: user.id }}" class="btn btn-primary">Modifier</router-link> -->
           <router-link :to="`/modify-profile/${user.id}`" class="btn btn-primary  btn-modify" v-if="loggedIn">Modifier profil</router-link>
@@ -143,6 +143,10 @@ export default {
     width: 150px;
     height: 150px;
     object-fit: cover;
+  }
+
+  .text-bio {
+    white-space: pre-wrap;
   }
 
   .card-btns {

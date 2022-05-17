@@ -64,6 +64,7 @@
                     this.message = '';
                     // this.$emit('newcomment');
                     this.$router.go();
+                    // window.location.reload();
 
                 } catch (error) {
                     console.log(error.response.data);

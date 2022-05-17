@@ -81,8 +81,8 @@ export default {
   }
 
   .navbar .logo {
+    width: 225px;
     height: 50px;
-    width: 100%;
   }
 
   .navbar-nav {
