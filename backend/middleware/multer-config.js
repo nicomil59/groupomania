@@ -48,8 +48,6 @@ const upload = multer({
 
 // Exports
 
-// module.exports = multer({storage: storage}).single('avatar');
-
 module.exports = (req, res, next) => {
   upload(req, res, (err) => {
     if(err && err.code === "LIMIT_FILE_SIZE") {

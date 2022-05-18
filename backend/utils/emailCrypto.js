@@ -1,3 +1,5 @@
+// Fonctions pour crypter et décrypter un email
+
 // Import du package 'crypto-js'
 const CryptoJS = require("crypto-js");
 

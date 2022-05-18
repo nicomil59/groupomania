@@ -5,10 +5,6 @@ const db = require('../models');
 
 exports.createComment = (req, res, next) => {
 
-    console.log('req auth', req.auth.userId);
-    console.log('req body', req.body);
-    console.log('req.params.id', req.params.id);
-
     if (req.body.content.trim().length < 2) {
         return res.status(400).json({
             message: "Le message doit contenir au moins deux caractères"
@@ -30,7 +26,7 @@ exports.createComment = (req, res, next) => {
             });
         }
 
-        // Enregistrement du post dans la BD
+        // Enregistrement du commentaire dans la BD
 
         db.Comment.create({
             userId: req.auth.userId,
@@ -41,9 +37,6 @@ exports.createComment = (req, res, next) => {
             message: 'Commentaire bien ajouté !'
         }))
         .catch(error => {
-
-            console.log(error)
-
             res.status(400).json({
                 message: error.message
             })
@@ -60,17 +53,10 @@ exports.createComment = (req, res, next) => {
 };
 
 
-
-
-
 // ********** Mise à jour d'un COMMENTAIRE **********
 // **************************************************
 
 exports.updateComment = (req, res, next) => {
-
-    console.log('req auth', req.auth.userId);
-    console.log('req body', req.body);
-    console.log('req.params', req.params);
 
     if (req.body.content.trim().length < 2) {
         return res.status(400).json({
@@ -106,8 +92,6 @@ exports.updateComment = (req, res, next) => {
                     message: 'Commentaire non trouvé !'
                 });
             }
-
-            console.log("Créateur du commentaire", comment.userId)
 
             // Vérification si utilisateur = créateur du commentaire
 
@@ -136,10 +120,6 @@ exports.updateComment = (req, res, next) => {
             }
             )});
 
-            // res.status(200).json({
-            //     message: 'c ok',
-            // });
-
         })
         .catch(error => {
             res.status(404).json({
@@ -159,14 +139,10 @@ exports.updateComment = (req, res, next) => {
 };
 
 
-
 // ********** Suppression d'un COMMENTAIRE **********
 // **************************************************
 
 exports.deleteComment = (req, res, next) => {
-
-    console.log('req auth', req.auth.userId);
-    console.log('req.params', req.params);
 
     db.Post.findOne({
         where: {
@@ -196,8 +172,6 @@ exports.deleteComment = (req, res, next) => {
                     message: 'Commentaire non trouvé !'
                 });
             }
-
-            console.log("Créateur du commentaire", comment.userId)
 
             // Vérification si utilisateur = créateur du commentaire ou admin
 
@@ -231,7 +205,7 @@ exports.deleteComment = (req, res, next) => {
 
             })
             .catch(error => {
-                res.status(400).json({
+                res.status(404).json({
                     message: error.message
                 });
             });

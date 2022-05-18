@@ -3,11 +3,12 @@
         <!-- <h2 class="feed-title mb-5">Les derniers messages</h2> -->
         <!-- <p>{{ isUpdated }}</p> -->
         <div class="feed-posts mx-auto">
-            <ul class="mx-auto">
+            <ul v-if="posts.length > 0" class="mx-auto">
                 <li v-for="(post) in posts" :key="post.id" class="mb-5">
                     <PostItem v-bind:post="post" @postdeleted="getAllPosts()" />
                 </li>
             </ul>
+            <p v-else class="zero-post text-center">Aucun post publié pour l'instant !</p>
         </div>
     </section>
 </template>
@@ -94,6 +95,11 @@ export default {
       font-size: 1.5rem;
       display: inline-block;
       border-bottom: 3px solid #FD5835;
+    }
+
+    .zero-post {
+      font-size: 2rem;
+      font-weight: 500;
     }
     
 </style>

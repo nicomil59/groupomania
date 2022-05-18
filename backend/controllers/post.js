@@ -6,9 +6,6 @@ const db = require('../models');
 
 exports.createPost = (req, res, next) => {
 
-    console.log('req file', req.file);
-    console.log('req auth', req.auth.userId);
-
     // Vérification présence image dans la requête
 
     let postObj;
@@ -26,13 +23,10 @@ exports.createPost = (req, res, next) => {
         }
 
         postObj = {
-            // ...JSON.parse(req.body.post),
             content: content,
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         };
 
-        console.log("postObj", postObj);
-        
     } else {
         
         const content = req.body.content.trim();
@@ -46,7 +40,6 @@ exports.createPost = (req, res, next) => {
         }
 
         postObj = { content: content, imageUrl: null };
-        console.log("postObj", postObj);
     }
   
     // Enregistrement du post dans la BD
@@ -54,16 +47,12 @@ exports.createPost = (req, res, next) => {
     db.Post.create({
         userId: req.auth.userId,
         content: postObj.content,
-        // link: postObj.link,
         imageUrl: postObj.imageUrl
     })
     .then(() => res.status(201).json({
         message: 'Post créé avec succès !'
     }))
     .catch(error => {
-    
-        console.log(error)
-
         res.status(400).json({
             message: error.message
         })
@@ -109,7 +98,7 @@ exports.getAllPosts = (req, res, next) => {
         if(posts) {
             res.status(200).json(posts);
         } else {
-            res.status(404).json({ error: 'Aucun post publié !' });
+            res.status(404).json({ message: 'Aucun post publié !' });
         }
     })
     .catch(error => {
@@ -161,16 +150,15 @@ exports.getOnePost = (req, res, next) => {
         // Vérification de l'existence du post
 
         if (post === null) {
-            return res.status(401).json({
+            return res.status(404).json({
                 message: 'Post non trouvé !'
             });
         }
         res.status(200).json(post);
     })
     .catch(error => {
-        res.status(404).json({
-            message: error.message,
-            error
+        res.status(500).json({
+            message: error.message
         });
     });
 
@@ -185,23 +173,45 @@ exports.getMyPosts = (req, res, next) => {
         where: {
             userId: req.auth.userId
         },
-        order: [['updatedAt', 'DESC'],],
-        attributes: ['id', 'userId', 'content', 'imageUrl', 'createdAt', 'updatedAt']
+        order: [['createdAt', 'DESC'],],
+        attributes: ['id', 'content', 'imageUrl', 'createdAt', 'updatedAt'],
+        include: [
+            {
+                model: db.User,
+                attributes: ['id', 'username', 'avatar']
+            },
+            {
+                model: db.Comment,
+                attributes: ['id', 'content', 'createdAt'],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: ['id', 'username', 'avatar']
+                    }
+                ]
+            },
+            {
+                model: db.Like,
+                attributes: ['id', 'createdAt'],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: ['id', 'username']
+                    }
+                ]
+            }
+        ]
     })
     .then(posts => {
-        
-        // Vérification de l'existence de posts
-        if (posts === null) {
-            return res.status(401).json({
-                message: 'Aucun post publié !'
-            });
+        if(posts.length > 0) {
+            res.status(200).json(posts);
+        } else {
+            res.status(404).json({ message: 'Aucun post publié !', posts });
         }
-        res.status(200).json(posts);
     })
     .catch(error => {
-        res.status(404).json({
-            message: error.message,
-            error
+        res.status(500).json({
+            message: error.message
         });
     });
 
@@ -222,7 +232,7 @@ exports.deletePost = (req, res, next) => {
         // Vérification de l'existence du post
 
         if (post === null) {
-            return res.status(401).json({
+            return res.status(404).json({
                 message: 'Post non trouvé !'
             });
         }
@@ -242,7 +252,6 @@ exports.deletePost = (req, res, next) => {
 
                 if(post.imageUrl !== null) {
                     const filename = post.imageUrl.split('/images/')[1];
-                    console.log('filename image à supprimer', filename);
             
                     fs.unlink(`images/${filename}`, error => {
                         if (error) throw error;
@@ -293,12 +302,13 @@ exports.deletePost = (req, res, next) => {
 
 exports.updatePost = (req, res, next) => {
     
-    console.log("req file", req.file);
-    console.log("req.body", req.body);
-
     // Validation du contenu du message
 
     const content = req.file === undefined ? req.body.content.trim() : JSON.parse(req.body.post).content.trim();
+
+    // 2 cas de figure
+    // cas 1 : image dans le post ET longueur message = 1 caractère (0 est autorisé)
+    // cas 2 : pas d'image dans le post ET longueur message inférieure à 2 caractères
 
     if (((req.file || req.body.keepPreviousImg) && content.length === 1) || (!req.file && !req.body.keepPreviousImg && content.length < 2)) {
         return res.status(400).json({
@@ -316,7 +326,7 @@ exports.updatePost = (req, res, next) => {
         // Vérification de l'existence du post
 
         if (post === null) {
-            return res.status(401).json({
+            return res.status(404).json({
                 message: 'Post non trouvé !'
             });
         }
@@ -331,7 +341,7 @@ exports.updatePost = (req, res, next) => {
 
         // Suppression de l'ancienne image du dossier images si elle existe
         
-        // Condition = il y avait déjà une image et on a une nouvelle image uploadée ou on souhaite supprimer l'image
+        // Condition = il y avait déjà une image ET (on a une nouvelle image uploadée ou on souhaite supprimer l'image)
         
         const deleteImg = req.body.deleteImg;
         
@@ -356,7 +366,6 @@ exports.updatePost = (req, res, next) => {
             const content = JSON.parse(req.body.post).content.trim();
             
             postObj = {
-                // ...JSON.parse(req.body.post),
                 content: content,
                 imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             };

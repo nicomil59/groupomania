@@ -53,7 +53,7 @@ export default {
 
 <style scoped>
   .container-compo {
-    margin-top: 5%;
+    margin-top: 3%;
   }
 
   .wall {

@@ -5,10 +5,6 @@ const db = require('../models');
 
 exports.like = (req, res, next) => {
 
-    console.log('req body', req.body === null);
-    console.log('req auth -- userId', req.auth.userId);
-    console.log('req.params.id -- postId', req.params.id);
-
     db.Post.findOne({
         where: {
             id: req.params.id
@@ -36,8 +32,6 @@ exports.like = (req, res, next) => {
 
             if (likeFound === null) {
 
-                console.log("Ajout d'un like");
-
                 // Ajout d'un like
 
                 db.Like.create({
@@ -48,9 +42,6 @@ exports.like = (req, res, next) => {
                     message: 'Like bien ajouté !'
                 }))
                 .catch(error => {
-        
-                    console.log(error)
-        
                     res.status(400).json({
                         message: error.message
                     })
@@ -58,8 +49,6 @@ exports.like = (req, res, next) => {
 
             } else {
 
-                console.log("suppression d'un like");
-    
                 // Suppression d'un like
     
                 db.Like.destroy({
@@ -86,7 +75,7 @@ exports.like = (req, res, next) => {
         
     })
     .catch(error => {
-        res.status(400).json({
+        res.status(404).json({
             message: error.message,
             error
         });

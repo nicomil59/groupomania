@@ -64,8 +64,6 @@ exports.signup = (req, res) => {
                     
                     const errorMessage = error.errors[0].message;
 
-                    console.log('errorMessage', errorMessage);
-
                     let errorMessageToSend;
 
                     if(errorMessage === 'username must be unique') {
@@ -106,7 +104,7 @@ exports.signin = (req, res, next) => {
             // Vérification de l'existence de l'utilisateur
 
             if (user === null) {
-                return res.status(401).json({
+                return res.status(404).json({
                     message: 'Utilisateur non trouvé !'
                 });
             }
@@ -150,8 +148,8 @@ exports.signin = (req, res, next) => {
         }));
 };
 
-// ********** Visualition du profil d'un utilisateur **********
-// ************************************************************
+// ********** Visualisation du profil d'un utilisateur **********
+// **************************************************************
 
 exports.getUser = (req, res, next) => {
 
@@ -168,7 +166,7 @@ exports.getUser = (req, res, next) => {
             // Vérification de l'existence de l'utilisateur
 
             if (user === null) {
-                return res.status(401).json({
+                return res.status(404).json({
                     message: 'Utilisateur non trouvé !'
                 });
             }
@@ -208,8 +206,6 @@ exports.getUser = (req, res, next) => {
 
 exports.updatePwdUser = (req, res, next) => {
 
-    console.log(req.body)
-    
     // Récupération dans la BD des infos de l'utilisateur qui correspond à l'id dans la requête
 
     db.User.findOne({
@@ -222,7 +218,7 @@ exports.updatePwdUser = (req, res, next) => {
             // Vérification de l'existence de l'utilisateur
 
             if (user === null) {
-                return res.status(401).json({
+                return res.status(404).json({
                     message: 'Utilisateur non trouvé !'
                 });
             }
@@ -307,7 +303,7 @@ exports.deleteUser = (req, res, next) => {
             // Vérification de l'existence de l'utilisateur
 
             if (user === null) {
-                return res.status(401).json({
+                return res.status(404).json({
                     message: 'Utilisateur non trouvé !'
                 });
             }
@@ -321,7 +317,6 @@ exports.deleteUser = (req, res, next) => {
             }
 
             const filename = user.avatar.split('/images/')[1];
-            console.log('filename image à supprimer', filename);
 
             if (filename !== 'default-avatar.png') {
 
@@ -383,7 +378,7 @@ exports.updateUser = (req, res, next) => {
             // Vérification de l'existence de l'utilisateur
 
             if (user === null) {
-                return res.status(401).json({
+                return res.status(404).json({
                     message: 'Utilisateur non trouvé !'
                 });
             }
@@ -462,8 +457,6 @@ exports.updateUser = (req, res, next) => {
             .catch(error => {
                     
                 const errorMessage = error.errors[0].message;
-
-                console.log('errorMessage', errorMessage);
 
                 let errorMessageToSend;
 
