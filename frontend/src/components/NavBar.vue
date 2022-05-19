@@ -29,6 +29,9 @@
           </li>
         </ul>
         <ul class="navbar-nav ms-auto" v-if="loggedIn">
+          <li class="nav-item nav-item-home">
+            <router-link to="/" class="nav-link"><i class="fas fa-home logo-home" title="Accueil"></i></router-link>
+          </li>
           <li class="nav-item">
             <router-link :to="{name: 'view-profile', params: { id: user.id }}" class="nav-link profile-link" data-toggle="tooltip" data-placement="bottom" :title="'Profil de ' + user.username">
               <div class="avatar-container">
@@ -141,9 +144,19 @@ export default {
     background-color: #EFEFEF;
   }
 
-  .nav-item-logout {
+  .nav-item-logout, .nav-item-home {
     display: flex;
     align-items: center;
+  }
+
+  .logo-home {
+    font-size: 2rem;
+    color: #FD5835;
+  }
+
+  .logo-home:hover {
+    font-size: 2rem;
+    color: #c1442b;
   }
 
   @media screen and (max-width: 992px) {
