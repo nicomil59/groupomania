@@ -21,7 +21,7 @@
 
                     <ul class="dropdown-menu dropdown-menu-right" v-bind:aria-labelledby="'dropdownMenuButton' + comment.id">
                         <li><button v-if="user.id === comment.User.id" class="dropdown-item" @click="editComment(comment.id)">Modifier</button></li>
-                        <li><button class="dropdown-item" @click="deleteComment(comment.id)">Supprimer</button></li>
+                        <li><button class="dropdown-item dropdown-item-delete" @click="deleteComment(comment.id)">Supprimer</button></li>
                     </ul>
                     
                 </div>
@@ -225,6 +225,18 @@
     
     .validFeedback {
         color: red;
+    }
+
+    .dropdown-item {
+        font-weight: 500;
+    }
+
+    .dropdown-item:active {
+        color: #fff;
+    }
+
+    .dropdown-item.dropdown-item-delete:active {
+        background-color: red;
     }
     
 </style>

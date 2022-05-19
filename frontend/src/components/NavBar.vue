@@ -30,7 +30,7 @@
         </ul>
         <ul class="navbar-nav ms-auto" v-if="loggedIn">
           <li class="nav-item nav-item-home">
-            <router-link to="/" class="nav-link"><i class="fas fa-home logo-home" title="Accueil"></i></router-link>
+            <router-link to="/" class="nav-link d-flex"><i class="fas fa-home logo-home" title="Accueil"></i></router-link>
           </li>
           <li class="nav-item">
             <router-link :to="{name: 'view-profile', params: { id: user.id }}" class="nav-link profile-link" data-toggle="tooltip" data-placement="bottom" :title="'Profil de ' + user.username">

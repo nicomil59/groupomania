@@ -23,7 +23,6 @@ export default {
   data() {
     return {
       posts: [],
-      // compoKey: 0
     };
   },
   methods: {
@@ -37,24 +36,18 @@ export default {
             },
           });
 
-          // console.log("response appel API getAllPosts", response);
           this.posts = response.data;
 
           this.$store.dispatch('setPosts', response.data);
           
       } catch (error) {
           console.log(error);  
-          console.log('OUUUUUUUUUUPS !')
-          this.$router.push('/login');  
       }
     }
   },
   async beforeMount() {
     this.getAllPosts();
-  },
-  // updated() {
-  //   console.log('Feed mis à jour !')
-  // }
+  }
 }
 
 </script>

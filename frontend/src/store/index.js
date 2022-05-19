@@ -1,10 +1,10 @@
 import { createStore } from 'vuex'
+import jwt_decode from "jwt-decode";
 
 export default createStore({
   state: {
     user: null,
     logged: false,
-    isToken: false,
     posts: []
   },
   getters: {
@@ -45,13 +45,24 @@ export default createStore({
       context.commit('SET_POSTS', posts)
     },
     checkToken({ commit }) {
-      // commit;
       if(localStorage.getItem("token")) {
         // console.log("localstorage token", localStorage.getItem("token"))
         // console.log("localstorage userID", localStorage.getItem("userId"))
+        const token = localStorage.getItem("token");
+        const decodedToken = jwt_decode(token);
+        // console.log("*** decoded token***", decodedToken.exp * 1000);
+        console.log('*** DELTA en heures ***', (Date.now() - (decodedToken.exp * 1000))/1000/3600);
 
-        commit('SET_LOGIN')
-        commit('SET_USER', JSON.parse(localStorage.getItem("user")))
+        if(Date.now() >= decodedToken.exp * 1000) {
+          console.log('token expiré');
+          alert('Session expirée - veuillez vous reconnecter');
+          localStorage.clear();
+          commit('SET_LOGOUT');
+        } else {
+            commit('SET_LOGIN')
+            commit('SET_USER', JSON.parse(localStorage.getItem("user")))
+        }
+
       } else {
         // console.log("localstorage token", localStorage.getItem("token"))
         console.log('pas de token')

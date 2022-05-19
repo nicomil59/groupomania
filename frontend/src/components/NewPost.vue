@@ -77,6 +77,13 @@ import Api from '../services/Api';
 
         } catch (error) {
             console.log(error.response.data);
+            // gestion token expiré
+            if(error.response.data.isTokenExpired) {
+              localStorage.clear();
+              this.$store.dispatch('setLogout');
+              alert('Session expirée - veuillez vous reconnecter');
+              this.$router.push('/login');
+            }
             this.valid = false;
             this.errorMessage = error.response.data.message;
         }
@@ -96,10 +103,10 @@ import Api from '../services/Api';
 
           // preview uploaded image
           let reader = new FileReader;
-          const vm = this;
+          // const vm = this;
 
           reader.onload = e => {
-            vm.previewImage = e.target.result;
+            this.previewImage = e.target.result;
           }
           reader.readAsDataURL(file);
 

@@ -24,7 +24,7 @@
 
                     <ul class="dropdown-menu dropdown-menu-right" v-bind:aria-labelledby="'dropdownMenuButton' + post.id">
                         <li><button v-if="user.id === post.User.id" class="dropdown-item" @click="editPost(post.id)">Modifier</button></li>
-                        <li><button class="dropdown-item" @click="deletePost(post.id)">Supprimer</button></li>
+                        <li><button class="dropdown-item dropdown-item-delete" @click="deletePost(post.id)">Supprimer</button></li>
                     </ul>
                     
                 </div>
@@ -264,10 +264,10 @@
 
                     // preview uploaded image
                     let reader = new FileReader;
-                    const vm = this;
+                    // const vm = this;
 
                     reader.onload = e => {
-                        vm.previewImageEdit = e.target.result;
+                        this.previewImageEdit = e.target.result;
                     }
                     reader.readAsDataURL(file);
 
@@ -395,6 +395,18 @@
 
     .btn-abort:hover {
         background-color: #d6d6d6;
+    }
+
+    .dropdown-item {
+        font-weight: 500;
+    }
+
+    .dropdown-item:active {
+        color: #fff;
+    }
+
+    .dropdown-item.dropdown-item-delete:active {
+        background-color: red;
     }
     
 </style>

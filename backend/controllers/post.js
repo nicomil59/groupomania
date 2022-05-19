@@ -98,7 +98,7 @@ exports.getAllPosts = (req, res, next) => {
         if(posts) {
             res.status(200).json(posts);
         } else {
-            res.status(404).json({ message: 'Aucun post publié !' });
+            res.status(404).json({ message: 'Erreur de récupération des posts' });
         }
     })
     .catch(error => {
@@ -203,10 +203,10 @@ exports.getMyPosts = (req, res, next) => {
         ]
     })
     .then(posts => {
-        if(posts.length > 0) {
+        if(posts) {
             res.status(200).json(posts);
         } else {
-            res.status(404).json({ message: 'Aucun post publié !', posts });
+            res.status(404).json({ message: 'Erreur de récupération des posts' });
         }
     })
     .catch(error => {
