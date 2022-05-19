@@ -45,7 +45,6 @@ export default {
         email: this.email,
         password: this.password
       }
-      console.log(dataInput)
 
       try {
         await Api.post('users/signup', dataInput);
@@ -53,12 +52,12 @@ export default {
         this.$router.push('/login');
         
       } catch (error) {
-        this.valid = false;
-        if (error.response.data.message.includes('The string')) {
-          this.errorMessage = "Votre mot de passe doit contenir 8 caractères au minimum, contenir des lettres (majuscule et minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.";
-        } else {
-          this.errorMessage = error.response.data.message;
-        }
+          this.valid = false;
+          if (error.response.data.message.includes('The string')) {
+            this.errorMessage = "Votre mot de passe doit contenir 8 caractères au minimum, contenir des lettres (majuscule et minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.";
+          } else {
+            this.errorMessage = error.response.data.message;
+          }
       }
     },
     resetErrorMessage() {

@@ -39,7 +39,6 @@ export default {
         username: this.username,
         password: this.password
       }
-      console.log(dataInput);
 
       try {
         const response = await Api.post('users/signin', dataInput);

@@ -37,7 +37,6 @@
         },
         methods: {
             async handleLike() {
-                console.log('click on Like')
 
                 // Affichage du like                
                 this.displayLike();
@@ -47,17 +46,14 @@
                 const token = localStorage.getItem("token");
 
                 try {
-                    const response = await Api.post(`posts/${postId}/like`, null, {
+                    await Api.post(`posts/${postId}/like`, null, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
                     });
 
-                    console.log("response data", response.data);
-                    
                 } catch (error) {
                     console.log(error.response.data);
-                    console.log(error);
                 }
 
             },
@@ -120,7 +116,6 @@
             -webkit-transform: scale(1);
             transform: scale(1);
         }
-
     }
 
     .anim {
@@ -154,6 +149,5 @@
     .count-like {
         font-weight: 500;
     }
-
     
 </style>

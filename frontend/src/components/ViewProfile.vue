@@ -10,11 +10,8 @@
         <p class="text-muted mb-3">{{ email }}</p>
         <p class="mb-4 text-bio" ref="bio"></p>
         <div class="d-flex justify-content-center mb-2 card-btns">
-          <!-- <router-link :to="{name: 'modify-profile', params: { id: user.id }}" class="btn btn-primary">Modifier</router-link> -->
           <router-link :to="`/modify-profile/${user.id}`" class="btn btn-primary  btn-modify" v-if="loggedIn">Modifier profil</router-link>
-          <!-- <router-link :to="`/modify-profile/${userId}`" class="btn btn-primary  btn-modify" v-if="!loggedIn">Modifier profil</router-link> -->
           <router-link :to="`/modify-password/${user.id}`" class="btn btn-primary btn-password" v-if="loggedIn">Modifier mot de passe</router-link>
-          <!-- <router-link :to="`/modify-password/${userId}`" class="btn btn-primary btn-password" v-if="!loggedIn">Modifier mot de passe</router-link> -->
           <button @click="deleteUser" class="btn btn-groupo">Supprimer compte</button>
         </div>
       </div>
@@ -36,7 +33,6 @@ export default {
       email: '',
       bio: '',
       avatar: '',
-      userId: '',
     };
   },
   computed: {
@@ -55,13 +51,11 @@ export default {
       }
 
       try {
-        const response = await Api.delete(`users/${userId}`, {
+        await Api.delete(`users/${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             }}
         );
-
-        console.log(response.data);
 
         localStorage.removeItem('userId');
         localStorage.removeItem('token');
@@ -72,56 +66,52 @@ export default {
         alert('Compte supprimé !')
 
         // redirection vers la page d'inscription
-          this.$router.push('/signup');
+        this.$router.push('/signup');
 
       } catch (error) {
         console.log(error.response.data);
       }
-    }
+    },
+    async getUser() {
+
+      const token = localStorage.getItem("token");
+      const userIdFromLocalStorage = localStorage.getItem("userId");
+      const userIdParams = this.$route.params.id;
+
+      try {
+        
+        if (userIdParams !== userIdFromLocalStorage) {
+          throw Error("Vous n'avez pas l'autorisation d'accéder à cette page");
+        }
+        
+        const response = await Api.get(`users/${userIdParams}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        this.username = response.data.username;
+        this.email = response.data.email;
+        this.bio = response.data.bio;
+        this.$refs.bio.innerHTML = this.bio !== null ? getClickableLink(response.data.bio) : '';
+        this.avatar = response.data.avatar;
+
+        // Mise à jour de l'email en clair dans le state
+
+        const updatedUser = Object.assign({...this.$store.state.user}, {email: this.email});
+        this.$store.dispatch('setUser', updatedUser);
+        // localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      } catch (error) {
+          console.log(error);
+          alert("Accès non autorisé");
+          this.$router.push('/');
+          
+      }
+    },
   },
   async beforeMount() {
-    
-    const token = localStorage.getItem("token");
-    const userIdFromLocalStorage = localStorage.getItem("userId");
-    const userIdParams = this.$route.params.id;
-
-    try {
-      
-      if (userIdParams !== userIdFromLocalStorage) {
-        throw Error("Vous n'avez pas l'autorisation d'accéder à cette page");
-      }
-      
-      const response = await Api.get(`users/${userIdParams}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      this.username = response.data.username;
-      this.email = response.data.email;
-      this.bio = response.data.bio;
-      console.log('response.data.bio', this.bio);
-      this.$refs.bio.innerHTML = this.bio !== null ? getClickableLink(response.data.bio) : '';
-      this.avatar = response.data.avatar;
-      this.userId = response.data.id;
-
-      // Mise à jour de l'email en clair dans le state et le localStorage
-
-      const updatedUser = Object.assign({...this.$store.state.user}, {email: this.email});
-      this.$store.dispatch('setUser', updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    } catch (error) {
-        console.log(error);
-        alert("Accès non autorisé");
-        this.$router.push('/');
-        
-    }
-  },
-  mounted() {
-    // console.log('mounted')
-    // console.log('params route', this.$route.params.id);
-    // console.log(this.$store.state.user);
+    this.getUser();
   }
 };
 </script>

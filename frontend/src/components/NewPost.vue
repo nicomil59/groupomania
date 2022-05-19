@@ -14,7 +14,6 @@
         <img v-if="previewImage" class="image-preview mb-4" :src="previewImage" />
 
         <p v-if="!valid" class="validFeedback">{{ errorMessage }}</p>
-        <!-- <p v-if="isEmptyContent" class="validFeedback">Un message seul doit contenir au moins deux caractères.</p> -->
 
         <div class="d-flex justify-content-end mb-2 card-btns">
           <label for="newPostImage" class="form-label image-label d-flex"><i class="fas fa-image image-icon"></i>Image</label>
@@ -43,15 +42,10 @@ import Api from '../services/Api';
       };
     },
     computed: {
-      ...mapGetters(['user']),
-      // isEmptyContent() {
-      //   return this.previewImage === '' && this.message.length < 2;
-      // }
+      ...mapGetters(['user'])
     },
     methods: {
       async handleSubmit() {  
-        console.log('submit !')
-
         let body = { content: this.message}; 
 
         // si image uploadée, envoi d'un objet formData
@@ -63,27 +57,23 @@ import Api from '../services/Api';
           body = formData;
         }
 
-        console.log(body);
-
         const token = localStorage.getItem("token");
 
         try {
-          const response = await Api.post('posts', body, {
+          await Api.post('posts', body, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
           });
 
-          console.log("response data", response.data);
-
           this.message = '';
           this.selectedFile = null;
           this.previewImage = '';
+          this.valid = true;
+          this.errorMessage = '';
 
-          // this.$router.go();
           this.$emit('newpost');
-          // window.location.reload();
 
         } catch (error) {
             console.log(error.response.data);
@@ -97,7 +87,6 @@ import Api from '../services/Api';
         if (!file) {
           return
         }
-        console.log('file', file)
         const allowedTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
         const MAX_SIZE = 1048576;
         const tooLarge = file.size > MAX_SIZE;
@@ -127,9 +116,6 @@ import Api from '../services/Api';
       resetErrorMessage() {
         this.valid = true;
       },
-    },
-    beforeMount() {
-      console.log('beforeMount newpost');
     }
   }
 </script>

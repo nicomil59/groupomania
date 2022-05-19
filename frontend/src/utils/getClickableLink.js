@@ -1,4 +1,4 @@
-// Fonction permettant de rendre un lien cliquable
+// Fonction permettant de rendre un lien cliquable dans une chaîne de caractères
 
 export default function getClickableLink(text) {
     const exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig; // eslint-disable-line

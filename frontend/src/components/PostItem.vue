@@ -1,5 +1,8 @@
 <template>
     <div class="card post-card">
+
+        <!-- Entête du post -->
+
         <div class="card-header bg-white p-3">
             <div class="d-flex justify-content-between align-items-center">
 
@@ -29,19 +32,20 @@
             </div>
         </div>
 
+        <!-- Contenu du post : texte et image -->
+
         <div v-show="!toModify" class="card-body">
             <p class="card-text" ref="mycardtext">
                 
             </p>
             <img loading="lazy" v-if="post.imageUrl" :src="post.imageUrl" alt="image" class="post-image">
-            <!-- <p v-if="isUpdated" class="post-firstpublished mb-0 mt-3 text-end">Première publication le {{ formatTimeUpdated(post.createdAt) }}</p> -->
         </div>
 
         <!-- Affichage lors de la modification -->
 
         <div v-if="toModify" class="card-body">
             <h3 class="text-center mb-3">Modifier la publication</h3>
-            <form @submit.prevent="handleSubmit" id="myForm" enctype="multipart/form-data" class="mb-3">
+            <form @submit.prevent="modifyPost" id="myForm" enctype="multipart/form-data" class="mb-3">
                 <div class="mb-3">
                     <label for="messageInput" class="form-label">Message</label>
                     <textarea @click="resetErrorMessage" v-model="messageEdit" type="text" class="form-control" id="messageInput" rows="5" />
@@ -51,7 +55,6 @@
                     <img v-if="previewImageEdit" class="image-preview d-block mb-3" :src="previewImageEdit" />
                     <button v-if="previewImageEdit" @click.prevent="removeImage" class="btn btn-danger mb-3">Retirer image</button>
                     <input v-if="!previewImageEdit" class="form-control btn-upload mb-3" type="file" id="imageInput" ref="imageInput" @change="onFileSelected" @click="resetErrorMessage">
-                    <!-- <a v-if="!selectedFileEdit" @click="removeImage" class="btn btn-danger mb-3">Supprimer image</a> -->
                 </div>
                 
                 <p v-if="!validEdit" class="validFeedback">{{ errorMessageEdit }}</p>
@@ -61,12 +64,13 @@
             </form>
             
         </div>
-        <!-- <div class="card-footer d-flex bg-white p-3">
-            <a href="#" class="card-link"><i class="far fa-heart"></i> J'aime</a>
-        </div> -->
+
+        <!-- Affichage bouton like -->
+        
         <LikeItem v-bind:postId="post.id" v-bind:likes="likes" />
 
         <!-- Affichage des commentaires -->
+
         <div v-if="comments.length > 0 && comments.length <= 2" class="post-comments">
             <ul>
                 <li v-for="comment in comments" :key="comment.id" class="mb-2">
@@ -88,9 +92,9 @@
             </ul>
         </div>
 
-        <!-- Rédaction d'un nouveau commentaire -->
+        <!-- Affichage champ rédaction nouveau commentaire -->
 
-        <NewComment v-if="!toModify" v-bind:postId="post.id" />
+        <NewComment v-if="!toModify" v-bind:postId="post.id" @newcomment="Date.now()" />
     </div>
 
 </template>
@@ -129,16 +133,11 @@
                 keepPreviousImg: false,
                 comments: this.$props.post.Comments,
                 showMore: false,
-                // isUpdated: false,
-                // onePost: this.$props.post,
                 likes: this.$props.post.Likes
             };
         },
         computed: {
             ...mapGetters(["user"]),
-            // isUpdated() {
-            //     return this.$props.post.createdAt !== this.$props.post.updatedAt;
-            // }
             isEmptyContent() {
               return this.previewImageEdit === '' && this.messageEdit.length < 2;
             }
@@ -158,15 +157,10 @@
                     return moment(time).fromNow();
                 }
             },
-            // formatTimeUpdated(time) {
-            //     return moment(time).format('dddd Do MMMM YYYY à HH:mm');
-            // },
             async deletePost(id) {
 
                 const token = localStorage.getItem("token");
                 const postId = id;
-
-                console.log('id du post à supprimer', id);
 
                 let okToDelete = confirm('Vous êtes sûr(e) de supprimer ce post ?')
                 if (!okToDelete) {
@@ -174,33 +168,25 @@
                 }
 
                 try {
-                    const response = await Api.delete(`posts/${postId}`, {
+                    await Api.delete(`posts/${postId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         }
                     });
 
-                    console.log(response.data);
-
                     alert('Post supprimé !');
                     this.$emit('postdeleted');
-                    // this.$router.go();
 
                 } catch (error) {
                     console.log(error.response.data);
                 }
             },
             editPost(id) {
-                console.log('edit du Post n°', id);
                 this.toModify = true;
                 this.postId = id;
             },
-            async handleSubmit() {
+            async modifyPost() {
       
-                console.log('id du message à éditer', this.postId)
-                console.log('message edited', this.messageEdit)
-                console.log('effacer image ?', this.deleteImg)
-
                 this.keepPreviousImg = this.previewImageEdit === this.previousImage;
 
                 const postInfos = {
@@ -223,13 +209,12 @@
                 const token = localStorage.getItem("token");
 
                 try {
-                    const response = await Api.put(`posts/${this.postId}`, body, {
+                    await Api.put(`posts/${this.postId}`, body, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         },
                     });
-                    console.log("response appel API update", response.data);
 
                     alert('Les modifications ont bien été enregistrées !');
 
@@ -239,8 +224,9 @@
                     this.deleteImg = false;
                     this.keepPreviousImg = false;
                     this.toModify = false;
-                    // window.location.reload();
-                    this.$router.go();
+
+                    this.$emit('postupdated');
+                    // this.$router.go();
 
                 } catch (error) {
                     console.log(error.response.data);
@@ -250,7 +236,6 @@
             },
             abort() {
                 this.toModify = false;
-                // this.$refs.mycardtext.innerHTML = getClickableLink(this.$props.post.content);
                 this.messageEdit = this.$props.post.content;
                 this.previewImageEdit = this.previousImage;
                 this.selectedFileEdit = null;
@@ -261,7 +246,6 @@
             },
             onFileSelected(e) {
                 const file = e.target.files[0];
-                console.log('file', file)
                 if (!file) {
                     if(this.deleteImg) {
                         this.previewImageEdit = '';
@@ -277,10 +261,6 @@
 
                 if(allowedTypes.includes(file.type) && !tooLarge) {
                     this.selectedFileEdit = e.target.files[0];
-
-                    // if(this.previewImageEdit) {
-                    //     this.previousImage = this.previewImageEdit;
-                    // }
 
                     // preview uploaded image
                     let reader = new FileReader;
@@ -308,49 +288,18 @@
             showMoreComments() {
                 this.showMore = true;
                 this.$refs.showMoreBtn.style.display = 'none';
-            },
-            // callFeed() {
-            //     console.log('call feed !')
-            //     this.$emit('reloadfeed');
-            // }
-            // setReload(postId) {
-            //     console.log('set Reload')
-            //     this.getPost(postId);
-            // },
-            // async getPost(postId) {
-            //     const token = localStorage.getItem("token");
-
-            //     try {
-            //         const response = await Api.get(`posts/${postId}`, {
-            //             headers: {
-            //                 Authorization: `Bearer ${token}`,
-            //             },
-            //         });
-
-            //         console.log("response appel API getOnePost", response);
-            //         this.onePost = response.data;
-                    
-            //     } catch (error) {
-            //         console.log(error);    
-            //     }
-            // } 
-        },
-        beforeMount() {
-            // console.log('beforeMount Post Item');
-            // console.log(this.$store.state.user.isAdmin)
+            }
         },
         mounted() {
-            // console.log(this.$refs.mycardtext);
             this.$refs.mycardtext.innerHTML = getClickableLink(this.$props.post.content);
             if(this.previewImageEdit) {
                 this.previousImage = this.previewImageEdit;
             }
-
-            // console.log('commentaires', this.$props.post.Comments)
-            // console.log('likes', this.$props.post.Likes);
+            console.log('mounted !')
         },
         updated() {
             console.log("PostItem mis à jour")
+            this.$refs.mycardtext.innerHTML = getClickableLink(this.$props.post.content);
         }
     }
 </script>
@@ -397,20 +346,12 @@
     }
 
     .post-image {
-        max-width: 100%;
         width: 100%;
-        /* height: 100%; */
     }
 
     .post-time {
         font-size: 0.9rem;
     }
-
-    /* .post-firstpublished {
-        font-size: 13px;
-        color: #666;
-        font-style: italic;
-    } */
 
     label {
         font-weight: 500;

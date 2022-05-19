@@ -1,11 +1,9 @@
 <template>
     <section id="feed" class="mt-5">
-        <!-- <h2 class="feed-title mb-5">Les derniers messages</h2> -->
-        <!-- <p>{{ isUpdated }}</p> -->
         <div class="feed-posts mx-auto">
             <ul v-if="posts.length > 0" class="mx-auto">
                 <li v-for="(post) in posts" :key="post.id" class="mb-5">
-                    <PostItem v-bind:post="post" @postdeleted="getAllPosts()" />
+                    <PostItem v-bind:post="post" @postdeleted="getAllPosts()" @postupdated="getAllPosts()" />
                 </li>
             </ul>
             <p v-else class="zero-post text-center">Aucun post publié pour l'instant !</p>
@@ -25,7 +23,7 @@ export default {
   data() {
     return {
       posts: [],
-      compoKey: 0
+      // compoKey: 0
     };
   },
   methods: {
@@ -39,48 +37,24 @@ export default {
             },
           });
 
-          console.log("response appel API getAllPosts", response);
+          // console.log("response appel API getAllPosts", response);
           this.posts = response.data;
 
           this.$store.dispatch('setPosts', response.data);
           
       } catch (error) {
-          console.log('ooups')
-          console.log(error);    
+          console.log(error);  
+          console.log('OUUUUUUUUUUPS !')
+          this.$router.push('/login');  
       }
-    },
-    // setReload() {
-    //   console.log('reload after updated post');
-    //   setTimeout(() => {
-    //     this.compoKey += 1;
-    //     this.getAllPosts();
-    //   }, 2000);
-    // }    
+    }
   },
   async beforeMount() {
     this.getAllPosts();
-    // const token = localStorage.getItem("token");
-
-    // try {
-    //     const response = await Api.get('posts', {
-    //       headers: {
-    //           Authorization: `Bearer ${token}`,
-    //       },
-    //     });
-
-    //     console.log("response appel API getAllPosts", response);
-    //     this.posts = response.data;
-
-    //     this.$store.dispatch('setPosts', response.data);
-        
-    // } catch (error) {
-    //     console.log('ooups')
-    //     console.log(error);    
-    // }
   },
-  updated() {
-    console.log('Feed mis à jour !')
-  }
+  // updated() {
+  //   console.log('Feed mis à jour !')
+  // }
 }
 
 </script>

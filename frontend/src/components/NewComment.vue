@@ -34,7 +34,6 @@
         },
         data() {
             return {
-                // toModify: false,
                 valid: true,
                 errorMessage: '',
                 message: ''
@@ -45,26 +44,21 @@
         },
         methods: {
             async handleSubmit() {
-                console.log(this.message)
-
                 const body = { content: this.message };
                 const postId = this.$props.postId;
                 const token = localStorage.getItem("token");
 
                 try {
-                    const response = await Api.post(`posts/${postId}/comment`, body, {
+                    await Api.post(`posts/${postId}/comment`, body, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         }
                     });
 
-                    console.log("response data", response.data);
-
                     this.message = '';
-                    // this.$emit('newcomment');
+                    this.errorMessage = '';
                     this.$router.go();
-                    // window.location.reload();
 
                 } catch (error) {
                     console.log(error.response.data);
@@ -77,13 +71,6 @@
             resetErrorMessage() {
                 this.valid = true;
             }
-        },
-        beforeMount() {
-            // console.log('beforeMount Post Item');
-            // console.log(this.$store.state.user.isAdmin)
-        },
-        mounted() {
-            // console.log(this.$refs.mycardtext);
         }
     }
 </script>

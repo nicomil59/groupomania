@@ -90,7 +90,7 @@ export default {
   }
 
   .nav-item {
-    font-weight: bold;
+    font-weight: 500;
   }
 
   .nav-link {

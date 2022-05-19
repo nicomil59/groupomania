@@ -74,13 +74,11 @@
                 const userId = localStorage.getItem("userId");
 
                 try {
-                    const response = await Api.put(`users/${userId}/password`, dataInput, {
+                    await Api.put(`users/${userId}/password`, dataInput, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         }
                     });
-
-                    console.log("response data", response.data);
 
                     alert('Le mot de passe a bien été modifié !');
 
@@ -109,10 +107,6 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    .btn {
-        font-weight: bold !important;
-    }
-
     .container-compo {
         max-width: 500px;
         margin-top: 5%;

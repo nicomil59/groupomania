@@ -30,7 +30,6 @@
         </div>
 
         <div v-show="!toModify" class="card-body px-3 pt-1">
-            <!-- <p class="card-text">{{ comment.content }}</p> -->
             <p class="card-text" ref="commentContent"></p>
         </div>
 
@@ -98,11 +97,8 @@
             async deleteComment(id) {
 
                 const token = localStorage.getItem("token");
-                console.log(this.$props.postId, "this.$props.postId");
                 const postId = this.$props.postId;
                 const commentId = id;
-
-                console.log('id du commentaire à supprimer', id);
 
                 let okToDelete = confirm('Vous êtes sûr(e) de vouloir supprimer ce commentaire ?')
                 if (!okToDelete) {
@@ -110,13 +106,11 @@
                 }
 
                 try {
-                    const response = await Api.delete(`posts/${postId}/comment/${commentId}`, {
+                    await Api.delete(`posts/${postId}/comment/${commentId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         }
                     });
-
-                    console.log(response.data);
 
                     alert('Commentaire supprimé !');
                     this.$router.go();
@@ -126,7 +120,6 @@
                 }
             },
             editComment(id) {
-                console.log('edit du Commentaire n°', id);
                 this.toModify = true;
                 this.commentId = id;
             },
@@ -135,21 +128,16 @@
                 const token = localStorage.getItem("token");
                 const postId = this.$props.postId;
                 const commentId = this.commentId;
-                
-                console.log('id du post', postId)
-                console.log('id du commentaire à éditer', commentId)
-                console.log('message edited', this.messageEdit)
 
                 const body = { content: this.messageEdit };
 
                 try {
-                    const response = await Api.put(`posts/${postId}/comment/${commentId}`, body, {
+                    await Api.put(`posts/${postId}/comment/${commentId}`, body, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         },
                     });
-                    console.log("response appel API update", response.data);
 
                     alert('Le commentaire a bien été édité');
 
@@ -172,10 +160,6 @@
             resetErrorMessage() {
                 this.validEdit = true;
             }
-        },
-        beforeMount() {
-            // console.log('beforeMount Post Item');
-            // console.log("texte du commentaire: ", this.$props.comment.content);
         },
         mounted() {
             this.$refs.commentContent.innerHTML = getClickableLink(this.$props.comment.content);

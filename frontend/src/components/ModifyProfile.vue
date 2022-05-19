@@ -83,7 +83,6 @@ export default {
                 'Content-Type': 'application/json'
             }});
 
-        console.log("response data", response.data);
         const updatedData = response.data.updatedData;
         const updatedUser = Object.assign({...this.$store.state.user}, {...updatedData});
         
@@ -105,12 +104,8 @@ export default {
           
       }
     },
-    // selectImage() {
-    //   this.$refs.fileInput.click()
-    // },
     onFileSelected(e) {
       const file = e.target.files[0];
-      console.log(file)
       if (!file) {
         this.previewAvatar = this.previousAvatar;
         this.selectedFile = null;
@@ -130,12 +125,12 @@ export default {
           this.previewAvatar = e.target.result;
         }
         reader.readAsDataURL(file);
-        this.$emit('input', file);
+        // this.$emit('input', file);
 
       } else {
-        this.valid = false;
-        this.errorMessage = tooLarge ? "Fichier trop volumineux : la taille ne doit pas dépasser 1 Mo" : "Seules les images sont autorisées";
-        this.$refs.fileInput.value = '';
+          this.valid = false;
+          this.errorMessage = tooLarge ? "Fichier trop volumineux : la taille ne doit pas dépasser 1 Mo" : "Seules les images sont autorisées";
+          this.$refs.fileInput.value = '';
       }
     },
     abort() {
@@ -160,21 +155,12 @@ export default {
         this.selectedFile = null;
         this.isNewAvatar = false;
     },
-  },
-  mounted() {
-    // console.log(this.$store.state.user);
-    // console.log(document.getElementById('bioInput').value.length)
   }
-
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  /* .btn {
-    font-weight: bold !important;
-  } */
-
   .container-compo {
     max-width: 500px;
     margin-top: 3%;
@@ -212,8 +198,6 @@ export default {
     height: 100px;
     border-radius: 50%;
     display: block;
-    /* cursor: pointer; */
-    /* margin: 0 auto 30px; */
     background-size: cover;
     background-position: center center;
   }
