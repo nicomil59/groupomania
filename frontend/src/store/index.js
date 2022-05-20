@@ -46,12 +46,11 @@ export default createStore({
     },
     checkToken({ commit }) {
       if(localStorage.getItem("token")) {
-        // console.log("localstorage token", localStorage.getItem("token"))
-        // console.log("localstorage userID", localStorage.getItem("userId"))
         const token = localStorage.getItem("token");
         const decodedToken = jwt_decode(token);
-        // console.log("*** decoded token***", decodedToken.exp * 1000);
-        console.log('*** DELTA en heures ***', (Date.now() - (decodedToken.exp * 1000))/1000/3600);
+        console.log('*** Heures restantes avant expiration Token ***', Math.round(((decodedToken.exp * 1000) - Date.now())/1000/3600*100)/100);
+
+        // Vérification si token est expiré
 
         if(Date.now() >= decodedToken.exp * 1000) {
           console.log('token expiré');
@@ -64,7 +63,6 @@ export default createStore({
         }
 
       } else {
-        // console.log("localstorage token", localStorage.getItem("token"))
         console.log('pas de token')
         commit('SET_LOGOUT')
       }

@@ -12,7 +12,6 @@ module.exports = (req, res, next) => {
         const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY);
         const userId = decodedToken.userId;
-        console.log('delta BACK', decodedToken.exp*1000 - Date.now());
 
         // Enregistrement de l'userId dans l'objet de requête
 
@@ -27,17 +26,14 @@ module.exports = (req, res, next) => {
         }
     } catch (error) {
 
-        console.log('error auth', error.message);
-        let isTokenExpired = error.message === 'jwt expired';
-        // if(error.message === 'jwt expired') {
-        //     messageToSend = "Echec d'authentification : token expiré";
-        // } else {
-        //     messageToSend = "Echec d'authentification";
-        // }
+        if(error.message === 'jwt expired') {
+            messageToSend = "Echec d'authentification : session expirée";
+        } else {
+            messageToSend = "Echec d'authentification";
+        }
 
         res.status(401).json({
-            message: "Echec d'authentification",
-            isTokenExpired: isTokenExpired,
+            message: messageToSend,
             error: error
         });
     }

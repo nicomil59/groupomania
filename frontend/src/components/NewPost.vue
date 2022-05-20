@@ -77,13 +77,6 @@ import Api from '../services/Api';
 
         } catch (error) {
             console.log(error.response.data);
-            // gestion token expiré
-            if(error.response.data.isTokenExpired) {
-              localStorage.clear();
-              this.$store.dispatch('setLogout');
-              alert('Session expirée - veuillez vous reconnecter');
-              this.$router.push('/login');
-            }
             this.valid = false;
             this.errorMessage = error.response.data.message;
         }

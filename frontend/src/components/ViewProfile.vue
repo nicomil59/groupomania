@@ -75,14 +75,18 @@ export default {
     async getUser() {
 
       const token = localStorage.getItem("token");
-      // const userIdFromLocalStorage = localStorage.getItem("userId");
+      const userIdFromLocalStore = this.$store.state.user.id;
+      console.log('userIdFromLocalStore', userIdFromLocalStore);
       const userIdParams = this.$route.params.id;
+      console.log('userIdParams', userIdParams);
 
       try {
         
-        // if (userIdParams !== userIdFromLocalStorage) {
-        //   throw Error("Vous n'avez pas l'autorisation d'accéder à cette page");
-        // }
+        if (parseInt(userIdParams) !== userIdFromLocalStore) {
+          alert("Accès à cette page non autorisé");
+          this.$router.push('/');
+          return
+        }
         
         const response = await Api.get(`users/${userIdParams}`, {
           headers: {
@@ -100,18 +104,9 @@ export default {
 
         const updatedUser = Object.assign({...this.$store.state.user}, {email: this.email});
         this.$store.dispatch('setUser', updatedUser);
-        // localStorage.setItem("user", JSON.stringify(updatedUser));
 
       } catch (error) {
-          console.log(error);
-          // if(error.response.data.isTokenExpired) {
-          //     localStorage.clear();
-          //     this.$store.dispatch('setLogout');
-          //     alert('Session expirée - veuillez vous reconnecter');
-          // }
-
-          alert("Accès non autorisé");
-          this.$router.push('/');
+          console.log(error.response.data);
       }
     },
   },

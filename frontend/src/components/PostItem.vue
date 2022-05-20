@@ -295,7 +295,7 @@
             if(this.previewImageEdit) {
                 this.previousImage = this.previewImageEdit;
             }
-            console.log('mounted !')
+            // console.log('mounted !')
         },
         updated() {
             console.log("PostItem mis à jour")
