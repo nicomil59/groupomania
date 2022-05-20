@@ -30,11 +30,13 @@ npm install
 **Réglages**
 
 *Variables d'environnement* : s'inspirer des valeurs par défaut du fichier .env.example pour créer et remplir le fichier .env.
+
 La clé de chiffrement CryptoJS doit être composée d'exactement 16 ou 32 caractères.
 
 **Serveur de développement**
 
 Lancer le serveur de dévelopemment avec `npm run dev` (ou `nodemon server`) ou `npm run start` (ou `node server`).
+
 Le serveur utilise l'adresse `http://localhost:3000`.
 
 ## Front-end
@@ -55,6 +57,7 @@ npm install
 **Serveur de développement**
 
 Lancer le serveur de développement avec `npm run serve`.
+
 L'application est accessible à l'adresse `http://localhost:8080/`.
 
 ## Base de données
@@ -65,7 +68,7 @@ Dans le dossier backend/config, s'inspirer des valeurs par défaut du fichier `c
 Créer les tables de la BD avec la commande `npx sequelize-cli db:migrate`.
 
 ## Utilisation
-Pour créer un compte
+Pour créer un compte :
 - **Pseudo** : doit commencer par une lettre et contenir entre 3 et 30 caractères alphanumériques
 - **Email** : email valide
 - **Mot de passe** : doit contenir 8 caractères au minimum, contenir des lettres (majuscule et minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.
