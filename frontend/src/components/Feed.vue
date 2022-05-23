@@ -38,6 +38,8 @@ export default {
 
           this.posts = response.data;
 
+          console.log('posts dans Feed', this.posts);
+
           this.$store.dispatch('setPosts', response.data);
           
       } catch (error) {

@@ -65,7 +65,7 @@ exports.createPost = (req, res, next) => {
 exports.getAllPosts = (req, res, next) => {
     
     db.Post.findAll({
-        order: [['createdAt', 'DESC'],],
+        order: [['createdAt', 'DESC'], [db.Comment, 'createdAt', 'ASC' ], [db.Like, 'createdAt', 'ASC' ]],
         attributes: ['id', 'content', 'imageUrl', 'createdAt', 'updatedAt'],
         include: [
             {
@@ -118,6 +118,7 @@ exports.getOnePost = (req, res, next) => {
         where: {
             id: req.params.id
         },
+        order: [[db.Comment, 'createdAt', 'ASC' ], [db.Like, 'createdAt', 'ASC' ]],
         attributes: ['id', 'content', 'imageUrl', 'createdAt', 'updatedAt'],
         include: [
             {
@@ -173,7 +174,7 @@ exports.getMyPosts = (req, res, next) => {
         where: {
             userId: req.auth.userId
         },
-        order: [['createdAt', 'DESC'],],
+        order: [['createdAt', 'DESC'], [db.Comment, 'createdAt', 'ASC' ], [db.Like, 'createdAt', 'ASC' ]],
         attributes: ['id', 'content', 'imageUrl', 'createdAt', 'updatedAt'],
         include: [
             {
