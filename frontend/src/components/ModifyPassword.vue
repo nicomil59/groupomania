@@ -93,7 +93,7 @@
                         this.errorMessage = error.response.data.message;
                     } else {
                         this.errorMessage =
-                            "Votre mot de passe doit contenir 8 caractères au minimum, contenir des lettres (majuscule et minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.";
+                            "Votre mot de passe doit contenir 8 caractères au minimum, contenir des lettres (au moins une majuscule et au moins une minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.";
                     }
                 }
             },

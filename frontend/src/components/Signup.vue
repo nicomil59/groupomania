@@ -54,7 +54,7 @@ export default {
       } catch (error) {
           this.valid = false;
           if (error.response.data.message.includes('The string')) {
-            this.errorMessage = "Votre mot de passe doit contenir 8 caractères au minimum, contenir des lettres (majuscule et minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.";
+            this.errorMessage = "Votre mot de passe doit contenir 8 caractères au minimum, contenir des lettres (au moins une majuscule et au moins une minuscule), au moins 2 chiffres ainsi qu'au moins un caractère spécial.";
           } else {
             this.errorMessage = error.response.data.message;
           }
