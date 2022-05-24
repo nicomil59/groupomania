@@ -3,21 +3,21 @@
     "username": "xxxx",
     "password": "xxxx",
     "database": "xxxx",
-    "host": "xxxx",
-    "dialect": "xxxx"
+    "host": "localhost",
+    "dialect": "mysql"
   },
   "test": {
     "username": "xxxx",
     "password": "xxxx",
     "database": "xxxx",
-    "host": "xxxx",
-    "dialect": "xxxx"
+    "host": "localhost",
+    "dialect": "mysql"
   },
   "production": {
     "username": "xxxx",
     "password": "xxxx",
     "database": "xxxx",
-    "host": "xxxx",
-    "dialect": "xxxx"
+    "host": "localhost",
+    "dialect": "mysql"
   }
 }

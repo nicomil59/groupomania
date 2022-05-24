@@ -18,7 +18,7 @@ Réseau social interne de l'entreprise Groupomania.
 - Node.js
 - Express.js
 - Sequelize
-- Base de données : MySQL (cf partie Base de données, ci-dessous)
+- MySQL
 
 ### Instructions
 **Installation**
