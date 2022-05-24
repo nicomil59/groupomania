@@ -209,7 +209,7 @@
                 const token = localStorage.getItem("token");
 
                 try {
-                    await Api.put(`posts/${this.postId}`, body, {
+                    const response = await Api.put(`posts/${this.postId}`, body, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'
@@ -218,12 +218,19 @@
 
                     alert('Les modifications ont bien été enregistrées !');
 
+                    console.log("données mises à jour", response.data);
+
                     // this.messageEdit = '';
                     // this.previewImageEdit = '';
                     this.selectedFileEdit = null;
                     this.deleteImg = false;
                     this.keepPreviousImg = false;
                     this.toModify = false;
+
+                    if (response.data.updatedData.imageUrl !== null) {
+                        this.previousImage = response.data.updatedData.imageUrl;
+                        this.previewImageEdit = this.previousImage;
+                    }
 
                     this.$emit('postupdated');
                     // this.$router.go();
