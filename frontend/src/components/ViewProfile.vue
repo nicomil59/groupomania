@@ -76,9 +76,7 @@ export default {
 
       const token = localStorage.getItem("token");
       const userIdFromLocalStore = this.$store.state.user.id;
-      console.log('userIdFromLocalStore', userIdFromLocalStore);
       const userIdParams = this.$route.params.id;
-      console.log('userIdParams', userIdParams);
 
       try {
         
