@@ -360,7 +360,7 @@ exports.updateUser = (req, res, next) => {
     
     const bio = req.file === undefined ? req.body.bio : JSON.parse(req.body.user).bio;
 
-    if(bio!== null && bio.length > 255) {
+    if(bio !== null && bio.length > 255) {
         return res.status(400).json({
             message: 'Bio trop longue ! 255 caractères maximum !'
         });
